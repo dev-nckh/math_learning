@@ -1,17 +1,27 @@
-import {  StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import Point from './section_1'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import Point from './section_1';
+import PointIntroduction from '../../components/PointIntroduction';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
+const Chapter3 = () => {
+  const [showIntroduction, setShowIntroduction] = useState(true);
 
-const chapter3 = () => {
+  const handleIntroductionComplete = () => {
+    setShowIntroduction(false);
+  };
+
   return (
-    <View style={{ flex: 1}}>
-      <Point />
+    <View style={{ flex: 1 }}>
+      {showIntroduction ? (
+        <PointIntroduction onComplete={handleIntroductionComplete} />
+      ) : (
+        <Point />
+      )}
     </View>
-  )
-}
+  );
+};
 
-export default chapter3
+export default Chapter3;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({});
