@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Image, Dimensions, Animated } from 'react-native';
-import InstructionScreen from '../../components/InstructionScreen';
+import InstructionScreen from '../../components/introduction/InstructionPointScreen';
 import ScoreDisplay from '../../components/ScoreDisplay';
 import QuestionContainer from '../../components/QuestionContainer';
 import PointsRenderer from '../../components/PointsRenderer';
@@ -14,6 +14,7 @@ import questions from '../../constants/questions';
 import characterImages from '../../constants/images';
 import { AnswerKey } from '../../types';
 import { styles } from '../../styles/styles';
+import { useRouter } from 'expo-router';
 
 const { height } = Dimensions.get('window');
 
@@ -27,6 +28,8 @@ const Point = () => {
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [showResultModal, setShowResultModal] = useState(false);
   const [gameCompleted, setGameCompleted] = useState(false);
+
+    const router = useRouter();
   
   // Thêm state để lưu trữ kết quả của từng câu hỏi
   const [questionResults, setQuestionResults] = useState<{ [key: number]: boolean }>({});
@@ -115,6 +118,7 @@ const Point = () => {
   const continueGame = () => {
     resetGame();
     // Add navigation logic here
+    router.push('./section_2');
   };
 
   const handleRetry = () => {

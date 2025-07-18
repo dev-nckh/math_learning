@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Image, Animated } from 'react-native';
-import  characterImages  from '../constants/images';
-import { styles } from '../styles/styles';
+import  characterImages  from '../../constants/images';
+import { styles } from '../../styles/styles';
 
 interface InstructionScreenProps {
   fadeAnim: Animated.Value;
