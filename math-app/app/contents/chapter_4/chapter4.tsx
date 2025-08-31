@@ -31,7 +31,7 @@ const mathLessons: {
     description: "Cùng học cách cộng hai số với nhau",
     icon: "add-circle",
     color: "#FF7043",
-    route: "./Addition/LearnAddScene",
+    route: "./Addition/AddTheoryScene",
   },
   {
     id: "learn_subtract",
@@ -39,7 +39,7 @@ const mathLessons: {
     description: "Khám phá phép trừ cùng bạn Cú",
     icon: "remove-circle",
     color: "#4DB6AC",
-    route: "./Subtraction/LearnSubtractScene",
+    route: "./Subtraction/SubtractionTheoryScene",
   },
 ];
 const MenuLayout = () => {
@@ -92,7 +92,7 @@ const MenuLayout = () => {
           { transform: [{ translateY: titlePosition }] },
         ]}
       >
-        <Text style={styles.title}>Chapter 2</Text>
+        <Text style={styles.title}>Chapter 4</Text>
         <Text style={styles.subtitle}>Chọn phần để bắt đầu học</Text>
       </Animated.View>
 
