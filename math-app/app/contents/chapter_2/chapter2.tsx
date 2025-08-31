@@ -14,13 +14,6 @@ import { useRouter } from "expo-router";
 import Icon from "react-native-vector-icons/Ionicons";
 
 const { width, height } = Dimensions.get("window");
-type AllowedRoute =
-  | "/mathadd"
-  | "/mathsub"
-  | "/addnocarry"
-  | "/subnocarry"
-  | "/addwithcarry"
-  | "/ball_merge";
 
 type IoniconName = "add-circle" | "remove-circle";
 
@@ -30,7 +23,7 @@ const mathLessons: {
   description: string;
   icon: IoniconName;
   color: string;
-  route: AllowedRoute;
+  route: string;
 }[] = [
   {
     id: "learn_add",
@@ -38,7 +31,7 @@ const mathLessons: {
     description: "Cùng học cách cộng hai số với nhau",
     icon: "add-circle",
     color: "#FF7043",
-    route: "/mathadd",
+    route: "./Addition/LearnAddScene",
   },
   {
     id: "learn_subtract",
@@ -144,7 +137,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#667EEA",
   },
   titleContainer: {
-    flex: 0.5,
+    flex: 1,
     alignItems: "center",
     paddingHorizontal: 20,
   },
