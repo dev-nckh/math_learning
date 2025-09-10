@@ -15,7 +15,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 
 const { width, height } = Dimensions.get("window");
 
-type IoniconName = "add-circle" | "remove-circle";
+type IoniconName = "add-circle" | "remove-circle" | "nutrition-outline";
 
 const mathLessons: {
   id: string;
@@ -40,6 +40,14 @@ const mathLessons: {
     icon: "remove-circle",
     color: "#4DB6AC",
     route: "./Subtraction/SubtractionTheoryScene",
+  },
+  {
+    id: "merge_game",
+    title: "Game ghép trái cây",
+    description: "Cùng chơi game và luyện tập phép cộng",
+    icon: "nutrition-outline",
+    color: "#FF6B6B",
+    route: "./BallMerge/screens/BallMergeScreen",
   },
 ];
 const MenuLayout = () => {
@@ -212,10 +220,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: 30,
+    paddingTop: 150,
   },
   lessonButton: {
     width: width * 0.85,
-    height: 150,
+    height: 130,
     borderRadius: 20,
     padding: 24,
     flexDirection: "row",
