@@ -1,5 +1,5 @@
 
-import { TUTORIAL_STEPS } from 'app/(menu)/chapters/data/tutorialData/PointLine';
+import { TUTORIAL_STEPS } from 'app/(menu)/chapters/data/tutorialData/PointLine.data';
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   View, 
