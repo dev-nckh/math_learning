@@ -34,7 +34,7 @@ export const lessonsData: LessonsDataStructure = {
       ]
     },
     2: {
-      title: "Bài 2: Đếm từ 10 đến 20", 
+      title: "Bài 2: Đếm từ 10 đến 20",
       description: "Mở rộng khả năng đếm lên số 20",
       games: [
         { id: 1, title: "Đếm kẹo", type: "counting", difficulty: "Dễ" },
@@ -44,22 +44,33 @@ export const lessonsData: LessonsDataStructure = {
   },
   2: { // Chapter 2
     1: {
-      title: "Bài 1: Phép cộng cơ bản",
-      description: "Học phép cộng với số nhỏ",
+      title: "Bài 1: Phép cộng và trừ cơ bản",
+      description: "Học phép cộng và phép trừ với số nhỏ từ 1 đến 10",
       games: [
-        { id: 1, title: "Cộng quả bóng", type: "addition", difficulty: "Dễ" },
-        { id: 2, title: "Máy tính mini", type: "calculation", difficulty: "Trung bình" },
-        { id: 3, title: "Đua xe cộng số", type: "racing", difficulty: "Khó" },
+        { id: 1, title: "Phép cộng từ 1-10", type: "addition", difficulty: "Dễ" },
+        { id: 2, title: "Phép trừ từ 1-10", type: "subtraction", difficulty: "Dễ" },
+        { id: 3, title: "Học ...", type: "racing", difficulty: "Khó" },
       ]
     }
   },
   3: { // Chapter 3
     1: {
-      title: "Bài 2: Điểm và đoạn thẳng", 
+      title: "Bài 2: Điểm và đoạn thẳng",
       description: "Học cách vẽ điểm và đoạn thẳng",
       games: [
         { id: 1, title: "Vẽ điểm và đoạn thẳng", type: "draw", difficulty: "Dễ" },
-      
+
+      ]
+    }
+  },
+  4: { // Chapter 4
+    1: {
+      title: "Bài 4: Phép cộng và trừ phạm vi 100",
+      description: "Học phép cộng và phép trừ phạm vi từ 1 đến 100",
+      games: [
+        { id: 1, title: "Phép cộng từ 1-100", type: "addition100", difficulty: "Trung bình" },
+        { id: 2, title: "Phép trừ từ 1-100", type: "subtraction100", difficulty: "Trung bình" },
+
       ]
     }
   }
