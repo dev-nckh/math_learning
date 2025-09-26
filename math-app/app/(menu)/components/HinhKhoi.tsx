@@ -14,7 +14,6 @@ const HinhKhoi: React.FC<HinhKhoiProps> = ({
   renderShape,
   initialRotation = { x: 0.3, y: 0.3 },
 }) => {
-  const rotation = useRef({ ...initialRotation });
   const meshRef = useRef<THREE.Object3D | null>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
 
@@ -32,21 +31,27 @@ const HinhKhoi: React.FC<HinhKhoiProps> = ({
       // Áp dụng scale và rotation ban đầu
       if (meshRef.current) {
         meshRef.current.scale.set(3, 3, 3);
-        meshRef.current.rotation.x = rotation.current.x;
-        meshRef.current.rotation.y = rotation.current.y;
+        meshRef.current.rotation.x = initialRotation.x;
+        meshRef.current.rotation.y = initialRotation.y;
       }
     }
   }, [renderShape]);
+
+  // Cập nhật rotation mỗi khi prop initialRotation thay đổi
+  useEffect(() => {
+    if (meshRef.current && initialRotation) {
+      meshRef.current.rotation.x = initialRotation.x;
+      meshRef.current.rotation.y = initialRotation.y;
+    }
+  }, [initialRotation]);
 
   const panResponder = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: () => true,
       onPanResponderMove: (_, gesture) => {
         if (meshRef.current) {
-          rotation.current.y += gesture.dx * 0.01;
-          rotation.current.x += gesture.dy * 0.01;
-          meshRef.current.rotation.y = rotation.current.y;
-          meshRef.current.rotation.x = rotation.current.x;
+          meshRef.current.rotation.y += gesture.dx * 0.01;
+          meshRef.current.rotation.x += gesture.dy * 0.01;
         }
       },
     })
@@ -90,8 +95,8 @@ const HinhKhoi: React.FC<HinhKhoiProps> = ({
           const mesh = renderShape(scene);
           meshRef.current = mesh;
           mesh.scale.set(3, 3, 3); 
-          mesh.rotation.x = rotation.current.x;
-          mesh.rotation.y = rotation.current.y;
+          mesh.rotation.x = initialRotation.x;
+          mesh.rotation.y = initialRotation.y;
           scene.add(mesh);
 
           // Render loop

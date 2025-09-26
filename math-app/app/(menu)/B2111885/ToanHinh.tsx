@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router'; 
 import React, { useEffect, useRef } from 'react';
 import { Animated, Dimensions, Easing, Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-
+import BackButton from '../components/backButton';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const BUTTON_SIZE = SCREEN_WIDTH * 0.35; 
 const GIF_SIZE = SCREEN_WIDTH * 0.65;   
@@ -97,6 +97,7 @@ export default function ToanHinh() {
       <View style={styles.content}>
         {/* Div 1: Tiêu đề */}
         <View style={styles.div1}>
+          <BackButton style={{ alignSelf: 'flex-start', marginBottom: 8 }} />
           <Animated.Text style={[styles.header, { color: headerColor }]}>
             HÌNH HỌC LỚP 1
           </Animated.Text>

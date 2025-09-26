@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef } from 'react';
-import { Animated, Dimensions, Easing, Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Animated, Dimensions, Easing, Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const BUTTON_HEIGHT = SCREEN_WIDTH * 0.22;
@@ -112,6 +112,31 @@ export default function TroChoiHinhHoc() {
           <View style={styles.boxItemRight}>
             {/* Để trống cho item khác */}
           </View>
+          {/* Nút reset điểm */}
+          <TouchableOpacity
+            style={styles.resetButton}
+            onPress={(e) => {
+              e.stopPropagation();
+              Alert.alert(
+                'Xác nhận',
+                'Bạn có chắc muốn đặt lại điểm kỷ lục?',
+                [
+                  { text: 'Hủy', style: 'cancel' },
+                  {
+                    text: 'Đồng ý',
+                    style: 'destructive',
+                    onPress: async () => {
+                      await AsyncStorage.setItem('mathgame_high_score', '0');
+                      setHighScore(0);
+                    },
+                  },
+                ]
+              );
+            }}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.resetButtonText}>Reset</Text>
+          </TouchableOpacity>
         </TouchableOpacity>
 
         {/* Box trò chơi 2 */}
@@ -125,20 +150,6 @@ export default function TroChoiHinhHoc() {
           />
           <View style={styles.boxItemLeft}>
             <Text style={styles.labelBig}>Ghép Hình Vui Vui</Text>
-            <Text style={styles.highScoreText}></Text>
-          </View>
-          <View style={styles.boxItemRight} />
-        </TouchableOpacity>
-
-        {/* Box trò chơi 3 */}
-        <TouchableOpacity style={styles.box}>
-          <Image
-            source={require('../../../assets/images/B2111885/background_button3.jpg')}
-            style={styles.boxBg}
-            resizeMode="cover"
-          />
-          <View style={styles.boxItemLeft}>
-            <Text style={styles.labelBig}>Game3</Text>
             <Text style={styles.highScoreText}></Text>
           </View>
           <View style={styles.boxItemRight} />
@@ -196,7 +207,7 @@ const styles = StyleSheet.create({
   box: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: "25%",
+    height: "36%", // tăng chiều cao cho cân đối khi chỉ có 2 box
     width: '88%',
     backgroundColor: '#FFF9C4',
     borderRadius: 22,
@@ -241,6 +252,22 @@ const styles = StyleSheet.create({
     marginTop: 2,
     fontWeight: 'bold',
     paddingBottom: "1%",
+  },
+  resetButton: {
+    position: 'absolute',
+    bottom: 10,
+    right: 14,
+    backgroundColor: '#D32F2F',
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 16,
+    zIndex: 2,
+    elevation: 4,
+  },
+  resetButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 15,
   },
 });
 

@@ -7,6 +7,7 @@ import BaiGiangHinhHoc, { BaiGiangHinhHocHandle } from "../components/BaiGiangHi
 import GhiChu from "../components/GhiChu";
 import NhanVat from "../components/NhanVat";
 import TapVe from "../components/TapVe";
+import BackButton from '../components/backButton';
 
 const TITLES: Record<string, string> = {
   circle: "Bài Học Về Hình Tròn",
@@ -718,6 +719,10 @@ const DayHinhHoc = () => {
       style={styles.container}
       resizeMode="cover"
     >
+      {/* Thêm BackButton phía trên cùng, sát nội dung */}
+      <View style={{ width: '100%', alignItems: 'flex-start', marginTop: 45, marginBottom: 0 }}>
+        <BackButton />
+      </View>
       <View style={styles.overlay}>
         <View style={styles.box1}>{box1Content}</View>
         <View style={styles.box2}>

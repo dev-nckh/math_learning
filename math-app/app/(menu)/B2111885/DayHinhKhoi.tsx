@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import * as THREE from 'three';
 import HinhKhoi from '../components/HinhKhoi';
+import BackButton from '../components/backButton';
 
 const createTransparentMaterial = (color: number) => {
   return new THREE.MeshPhongMaterial({
@@ -128,22 +129,68 @@ const HINH_KHOI_LIST = [
   },
 ];
 
+const ROTATE_STEP = Math.PI / 7.2; // ~25 độ
+
 const DayHinhKhoi = () => {
   const [index, setIndex] = useState(0);
   const currentShape = HINH_KHOI_LIST[index];
 
+  // State điều khiển góc xoay
+  const [rotation, setRotation] = useState(
+    currentShape.initialRotation || { x: 0, y: 0 }
+  );
+
+  // Khi đổi hình, reset lại góc xoay về mặc định của hình đó (nếu có)
+  React.useEffect(() => {
+    setRotation(currentShape.initialRotation || { x: 0, y: 0 });
+  }, [index]);
+
   return (
     <View style={styles.container}>
-      <View style={styles.shapeContainer}>
-        <HinhKhoi 
-          renderShape={() => currentShape.renderShape()} 
-          initialRotation={currentShape.initialRotation} 
-        />
+      <View style={{ width: '100%', alignItems: 'flex-start', marginTop: 20, zIndex: 2 }}>
+        <BackButton />
       </View>
 
-      <View style={styles.textContainer}>
-        <Text style={styles.title}>{currentShape.name}</Text>
-        <Text style={styles.description}>{currentShape.desc}</Text>
+      <View style={styles.shapeContainer}>
+        <View style={styles.shape3DWrapper}>
+          {/* Nút xoay trái - góc trên trái */}
+          <TouchableOpacity
+            style={[styles.rotateButton, { left: 10, top: 10 }]}
+            onPress={() => setRotation(r => ({ ...r, y: r.y - ROTATE_STEP }))}
+          >
+            <Text style={styles.rotateButtonText}>←</Text>
+          </TouchableOpacity>
+          {/* Nút xoay xuống - góc dưới trái */}
+          <TouchableOpacity
+            style={[styles.rotateButton, { left: 10, bottom: 10 }]}
+            onPress={() => setRotation(r => ({ ...r, x: r.x + ROTATE_STEP }))}
+          >
+            <Text style={styles.rotateButtonText}>↓</Text>
+          </TouchableOpacity>
+          {/* Nút xoay phải - góc trên phải */}
+          <TouchableOpacity
+            style={[styles.rotateButton, { right: 10, top: 10 }]}
+            onPress={() => setRotation(r => ({ ...r, y: r.y + ROTATE_STEP }))}
+          >
+            <Text style={styles.rotateButtonText}>→</Text>
+          </TouchableOpacity>
+          {/* Nút xoay lên - góc dưới phải */}
+          <TouchableOpacity
+            style={[styles.rotateButton, { right: 10, bottom: 10 }]}
+            onPress={() => setRotation(r => ({ ...r, x: r.x - ROTATE_STEP }))}
+          >
+            <Text style={styles.rotateButtonText}>↑</Text>
+          </TouchableOpacity>
+
+          <HinhKhoi
+            renderShape={() => currentShape.renderShape()}
+            initialRotation={rotation}
+          />
+        </View>
+        <View style={styles.textOverlay}>
+          <Text style={styles.title}>{currentShape.name}</Text>
+          <Text style={styles.description}>{currentShape.desc}</Text>
+        </View>
       </View>
 
       <View style={styles.navigationContainer}>
@@ -176,19 +223,33 @@ const DayHinhKhoi = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#000000ff',
   },
   shapeContainer: {
-    height: '50%',
+    height: '50%', // Chia 50% chiều cao màn hình
     width: '100%',
     backgroundColor: '#f5f5f5',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    flexDirection: 'column',
+    paddingTop: 0,
+    paddingBottom: 0,
+    marginTop: 0, // Không bị đè lên nút back
   },
-  textContainer: {
-    height: '30%',
+  shape3DWrapper: {
     width: '100%',
-    padding: 20,
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 1,
+  },
+  textOverlay: {
+    width: '100%',
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    borderRadius: 12,
+    padding: 12,
+    alignItems: 'center',
+    marginTop: 0,
   },
   navigationContainer: {
     height: '20%',
@@ -225,6 +286,22 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  rotateButton: {
+    position: 'absolute',
+    backgroundColor: '#1976d2',
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+    opacity: 0.85,
+  },
+  rotateButtonText: {
+    color: '#fff',
+    fontSize: 22,
+    fontWeight: 'bold',
   },
 });
 

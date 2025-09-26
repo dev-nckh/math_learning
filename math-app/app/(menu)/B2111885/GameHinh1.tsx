@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 
 type ShapeType = 'circle' | 'square' | 'triangle' | 'rectangle';
 type ShapeObj = {
@@ -144,6 +145,7 @@ const FallingShape: React.FC<{
 };
 
 const GameHinh1: React.FC = () => {
+  const router = useRouter();
   const [position, setPosition] = React.useState(1);
   const [countdown, setCountdown] = React.useState(3);
   const [showCountdown, setShowCountdown] = React.useState(true);
@@ -326,12 +328,14 @@ const GameHinh1: React.FC = () => {
       <View style={styles.overlay}>
         {/* Box1: Hiển thị điểm */}
         <View style={styles.box1}>
-          <Text style={{ fontSize: 28, color: '#E65100', fontWeight: 'bold', marginLeft: 20 }}>
-            Điểm: {score}
-          </Text>
-          <Text style={{ fontSize: 18, color: '#388E3C', fontWeight: 'bold', marginLeft: 20 }}>
-            Kỷ lục: {highScore}
-          </Text>
+          <View style={{ alignItems: 'flex-end', width: '100%', paddingRight: 20 }}>
+            <Text style={{ fontSize: 28, color: '#E65100', fontWeight: 'bold' }}>
+              Điểm: {score}
+            </Text>
+            <Text style={{ fontSize: 18, color: '#fff', fontWeight: 'bold' }}>
+              Kỷ lục: {highScore}
+            </Text>
+          </View>
         </View>
 
         <View
@@ -369,9 +373,10 @@ const GameHinh1: React.FC = () => {
               <Image source={require('../../../assets/icons/back.png')} style={styles.arrowIcon} />
             </TouchableOpacity>
 
-            <View style={styles.currentShapeAbsolute}>
-              <Text style={styles.currentShapeText}>
-                {currentTargetShape ? `Bắt: ${getShapeName(currentTargetShape)}` : ''}
+            <View style={styles.currentShapeCenter}>
+              <Text style={styles.currentShapeLabel}>Bắt hình:</Text>
+              <Text style={styles.currentShapeTarget}>
+                {currentTargetShape ? getShapeName(currentTargetShape) : ''}
               </Text>
             </View>
 
@@ -403,18 +408,31 @@ const GameHinh1: React.FC = () => {
           <View style={styles.countdownOverlay}>
             <View style={styles.countdownBox}>
               <Text style={styles.countdownText}>Bạn đã thua!</Text>
-              <TouchableOpacity
-                style={{
-                  marginTop: 20,
-                  backgroundColor: '#E65100',
-                  paddingHorizontal: 32,
-                  paddingVertical: 12,
-                  borderRadius: 12,
-                }}
-                onPress={handleRestart}
-              >
-                <Text style={{ color: '#fff', fontSize: 20, fontWeight: 'bold' }}>Chơi lại</Text>
-              </TouchableOpacity>
+              <View style={{ flexDirection: 'row', marginTop: 20 }}>
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: '#E65100',
+                    paddingHorizontal: 32,
+                    paddingVertical: 12,
+                    borderRadius: 12,
+                    marginRight: 16,
+                  }}
+                  onPress={handleRestart}
+                >
+                  <Text style={{ color: '#fff', fontSize: 20, fontWeight: 'bold' }}>Chơi lại</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: '#388E3C',
+                    paddingHorizontal: 32,
+                    paddingVertical: 12,
+                    borderRadius: 12,
+                  }}
+                  onPress={() => router.replace('/(menu)/B2111885/TroChoiHinhHoc')}
+                >
+                  <Text style={{ color: '#fff', fontSize: 20, fontWeight: 'bold' }}>Trở về</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         )}
@@ -436,6 +454,8 @@ const styles = StyleSheet.create({
     flex: 1,
     position: 'relative',
     justifyContent: 'flex-end',
+    alignItems: 'flex-end', // căn phải
+    paddingRight: 0, // padding sẽ đặt ở View con
   },
   box2: {
     flex: 6,
@@ -463,6 +483,7 @@ const styles = StyleSheet.create({
   controlsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center', // căn giữa theo chiều dọc
     marginTop: '20%',
     paddingHorizontal: '5%',
     paddingVertical: '5%',
@@ -538,7 +559,7 @@ const styles = StyleSheet.create({
   },
   rectangleBig: {
     width: 80,
-    height: 80,
+    height: 60,
     backgroundColor: '#0288D1',
     borderWidth: 4,
     borderColor: '#0277BD',
@@ -568,23 +589,27 @@ const styles = StyleSheet.create({
     color: '#E65100',
     textAlign: 'center',
   },
-  currentShapeAbsolute: {
-    position: 'absolute',
-    left: '50%',
-    top: '50%',
-    width: 180,
-    height: 40,
+  currentShapeCenter: {
     alignItems: 'center',
     justifyContent: 'center',
-    transform: [{ translateX: -90 }, { translateY: -20 }],
-    zIndex: 20,
+    minWidth: 120,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 16,
   },
-  currentShapeText: {
-    fontSize: 24,
+  currentShapeLabel: {
+    fontSize: 18,
     color: '#fff',
     fontWeight: 'bold',
     textAlign: 'center',
-    width: 180,
+  },
+  currentShapeTarget: {
+    fontSize: 24,
+    color: '#FFD600',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 2,
   },
 });
 

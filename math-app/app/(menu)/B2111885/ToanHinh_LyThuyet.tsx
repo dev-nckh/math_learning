@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef } from 'react';
 import { Animated, Image, ImageBackground, StyleSheet, TouchableOpacity, View } from 'react-native';
+import BackButton from '../components/backButton';
 
 // Component chữ phát sáng nhấp nháy
 function GlowingText({ children, style }: { children: React.ReactNode, style?: any }) {
@@ -99,6 +100,10 @@ export default function ToanHinh_LyThuyet() {
       style={styles.container}
       resizeMode="cover"
     >
+      {/* Thêm BackButton phía trên cùng */}
+      <View style={{ width: '100%', alignItems: 'flex-start', marginTop: 30 }}>
+        <BackButton />
+      </View>
       <View style={styles.overlay}>
         {/* Box Hình Tròn */}
         <TouchableOpacity style={styles.box1} onPress={() => handlePress('circle', triggerBounce1)}>
@@ -196,9 +201,10 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start', 
     alignItems: 'stretch',
-    paddingVertical: '4%',
+    paddingTop: 20,            
+    paddingBottom: 0,             
   },
   labelBig: {
     fontSize: 30,
