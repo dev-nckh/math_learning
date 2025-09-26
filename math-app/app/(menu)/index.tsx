@@ -39,6 +39,14 @@ export default function MenuScreen() {
           Chapter 4: Phép cộng trừ trong phạm vi 100. Đo thời gian{" "}
         </Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.chapterButton}
+        onPress={()=>router.push('/(menu)/B2111885/ToanHinh')}
+      >
+        <Text style={styles.buttonText}>
+          Chapter 5: Hình học cơ bản  
+        </Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
