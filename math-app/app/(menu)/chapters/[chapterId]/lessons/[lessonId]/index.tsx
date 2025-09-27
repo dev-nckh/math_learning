@@ -61,6 +61,9 @@ export default function LessonScreen() {
       addition: "#e74c3c",
       calculation: "#f39c12",
       racing: "#1abc9c",
+
+      addition100: "#e74c3c",
+      subtraction100: "#27ae60",
     };
     return colors[type] || "#95a5a6";
   };
@@ -101,7 +104,7 @@ export default function LessonScreen() {
 
         {/* Games List */}
         <View style={styles.gamesSection}>
-          <Text style={styles.sectionTitle}>Trò chơi trong bài học:</Text>
+          <Text style={styles.sectionTitle}>Các bài học:</Text>
 
           {lessonData.games.map((game) => (
             <TouchableOpacity
