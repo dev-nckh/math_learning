@@ -226,6 +226,7 @@ export default function PhysicsBallGame({
       newBall.x = drawAreaWidth - newBall.radius;
       newBall.velocityX = -Math.abs(newBall.velocityX) * BOUNCE_DAMPING;
     }
+
     // Bounce off the bottom (grid floor) naturally
     if (newBall.y + newBall.radius >= drawAreaHeight) {
       newBall.y = drawAreaHeight - newBall.radius;
