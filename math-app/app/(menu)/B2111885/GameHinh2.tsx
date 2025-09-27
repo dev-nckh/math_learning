@@ -32,6 +32,7 @@ import ViewShot from 'react-native-view-shot';
 
 import ToanHinh_HinhNen from '../components/ToanHinh_HinhNen';
 import ToanHinh_NhanDan from '../components/ToanHinh_NhanDan';
+import BackButton from '../components/backButton';
 
 const { width } = Dimensions.get('window');
 
@@ -844,6 +845,10 @@ const GameHinh2 = () => {
           style={styles.container}
           resizeMode="cover"
         >
+          {/* Thêm BackButton phía trên cùng */}
+          <View style={{ width: '100%', alignItems: 'flex-start', marginTop: 12, marginBottom: 0, zIndex: 1000 }}>
+            <BackButton />
+          </View>
           <ViewShot ref={bodyRef} options={{ format: 'jpg', quality: 0.95 }} style={{ flex: 1 }}>
             {/* Khu vực xếp hình */}
             <View style={styles.playArea}>

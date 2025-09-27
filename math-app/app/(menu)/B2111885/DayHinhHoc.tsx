@@ -17,6 +17,14 @@ const TITLES: Record<string, string> = {
   solid: "Bài Học Về Hình Khối",
 };
 
+const SHAPE_BACKGROUNDS: Record<string, any> = {
+  circle: require('../../../assets/images/B2111885/main_background.jpg'),
+  square: require('../../../assets/images/B2111885/game_background.jpg'),
+  triangle: require('../../../assets/images/B2111885/main_background.jpg'),
+  rectangle: require('../../../assets/images/B2111885/main_background.jpg'),
+  // Nếu sau này có hình riêng thì thay đường dẫn ở đây
+};
+
 function nameShape(type: string): string {
   switch (type) {
     case "circle":
@@ -713,13 +721,16 @@ const DayHinhHoc = () => {
     ) : null;
   }
 
+  // Chỉ nhận 4 loại hình cơ bản
+  const allowedTypes = ['circle', 'square', 'triangle', 'rectangle'];
+  const shapeType = allowedTypes.includes(type as string) ? type : 'circle';
+
   return (
     <ImageBackground
-      source={require('../../../assets/images/B2111885/main_background.jpg')}
+      source={SHAPE_BACKGROUNDS[shapeType as string]}
       style={styles.container}
       resizeMode="cover"
     >
-      {/* Thêm BackButton phía trên cùng, sát nội dung */}
       <View style={{ width: '100%', alignItems: 'flex-start', marginTop: 45, marginBottom: 0 }}>
         <BackButton />
       </View>
@@ -788,7 +799,7 @@ const DayHinhHoc = () => {
         </View>
         <BaiGiangHinhHoc
           ref={audioRef}
-          type={type as string}
+          type={shapeType as string}
           step={step}
           key={restartKey}
         />

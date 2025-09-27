@@ -1,19 +1,19 @@
 // DayHinhKhoi.tsx
 import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
 import * as THREE from 'three';
 import HinhKhoi from '../components/HinhKhoi';
 import BackButton from '../components/backButton';
 
-const createTransparentMaterial = (color: number) => {
-  return new THREE.MeshPhongMaterial({
-    color: color,
-    transparent: true,
-    opacity: 0.6,
-    specular: 0x111111,
-    shininess: 30
-  });
-};
+
+const SHAPE_IMAGES = [
+  require('../../../assets/images/B2111885/HinhLapPhuong.png'),
+  require('../../../assets/images/B2111885/HinhHop.png'),
+  require('../../../assets/images/B2111885/HinhTru.png'),
+  require('../../../assets/images/B2111885/HinhChop.png'),
+  require('../../../assets/images/B2111885/HinhCau.png'),
+];
+
 
 // Ví dụ cho từng hình khối:
 const HINH_KHOI_LIST = [
@@ -148,7 +148,10 @@ const DayHinhKhoi = () => {
   return (
     <View style={styles.container}>
       <View style={{ width: '100%', alignItems: 'flex-start', marginTop: 20, zIndex: 2 }}>
-        <BackButton />
+        <BackButton
+          textStyle={{ color: '#000000ff' }}
+          iconColor="#000"
+        />
       </View>
 
       <View style={styles.shapeContainer}>
@@ -193,6 +196,15 @@ const DayHinhKhoi = () => {
         </View>
       </View>
 
+      {/* Hiển thị hình minh họa phía trên các nút điều hướng */}
+      <View style={styles.imagePreviewContainer}>
+        <Image
+          source={SHAPE_IMAGES[index]}
+          style={styles.imagePreview}
+          resizeMode="contain"
+        />
+      </View>
+
       <View style={styles.navigationContainer}>
         <TouchableOpacity
           disabled={index === 0}
@@ -223,7 +235,7 @@ const DayHinhKhoi = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000ff',
+    backgroundColor: '#ffffffff',
   },
   shapeContainer: {
     height: '50%', // Chia 50% chiều cao màn hình
@@ -245,11 +257,20 @@ const styles = StyleSheet.create({
   },
   textOverlay: {
     width: '100%',
-    backgroundColor: 'rgba(0,0,0,0.45)',
+    backgroundColor: 'rgba(255, 255, 255, 0.45)',
     borderRadius: 12,
     padding: 12,
     alignItems: 'center',
     marginTop: 0,
+  },
+  imagePreviewContainer: {
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  imagePreview: {
+    width: 200,
+    height: 200,
   },
   navigationContainer: {
     height: '20%',
@@ -277,7 +298,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   activeButton: {
-    backgroundColor: '#2196f3',
+    backgroundColor: '#6021f3ff',
   },
   disabledButton: {
     backgroundColor: '#ccc',
@@ -289,7 +310,7 @@ const styles = StyleSheet.create({
   },
   rotateButton: {
     position: 'absolute',
-    backgroundColor: '#1976d2',
+    backgroundColor: '#6021f3ff',
     width: 38,
     height: 38,
     borderRadius: 19,

@@ -6,16 +6,22 @@ interface BackButtonProps {
   style?: ViewStyle;
   textStyle?: TextStyle;
   label?: string;
+  iconColor?: string; // Thêm dòng này
 }
 
-const BackButton: React.FC<BackButtonProps> = ({ style, textStyle, label = 'Thoát' }) => {
+const BackButton: React.FC<BackButtonProps> = ({
+  style,
+  textStyle,
+  label = 'Thoát',
+  iconColor = '#fff', // Mặc định màu trắng
+}) => {
   const router = useRouter();
 
   return (
     <TouchableOpacity style={[styles.button, style]} onPress={() => router.back()}>
       <Image
         source={require('../../../assets/icons/back.png')}
-        style={styles.icon}
+        style={[styles.icon, { tintColor: iconColor }]} // Thêm tintColor
         resizeMode="contain"
       />
       <Text style={[styles.text, textStyle]}>{label}</Text>

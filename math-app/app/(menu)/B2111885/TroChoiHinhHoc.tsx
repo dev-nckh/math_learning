@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef } from 'react';
 import { Alert, Animated, Dimensions, Easing, Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import BackButton from '../components/backButton';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const BUTTON_HEIGHT = SCREEN_WIDTH * 0.22;
@@ -77,6 +78,11 @@ export default function TroChoiHinhHoc() {
       style={styles.container}
       resizeMode="cover"
     >
+      {/* Thêm BackButton phía trên cùng */}
+      <View style={{ width: '100%', alignItems: 'flex-start', marginTop: 20, marginBottom: 0 }}>
+        <BackButton />
+      </View>
+
       {/* div1: Bong bóng thoại trái, gif phải */}
       <View style={styles.div1}>
         <View style={styles.speechContainer}>
