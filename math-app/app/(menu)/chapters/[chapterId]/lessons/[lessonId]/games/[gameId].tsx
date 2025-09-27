@@ -9,11 +9,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 // Shared data (nên move ra file riêng)
 import { lessonsData } from "../../../../data/lessons.data";
 import DrawPointGame from "./types/PointLineGame";
+import MeasureLengthGame from "./types/MeasureLength";
 import AdditionGame from "./components/theory/ToanVo/Addition/LearnAddScene";
 import SubtractionGame from "./components/theory/ToanVo/Subtraction/LearnSubtractScene";
 
 import AdditionGame100 from "./components/theory/ToanVo1/Addition/AddTheoryScene";
 import SubtractionGame100 from "./components/theory/ToanVo1/Subtraction/SubtractionTheoryScene";
+
 interface GameProps {
   chapterId: string;
   lessonId: string;
@@ -57,6 +59,7 @@ export default function GameScreen() {
 
   // Game type dispatcher
   const renderGame = () => {
+    // For components that accept props
     const gameProps: GameProps = {
       chapterId: chapterId as string,
       lessonId: lessonId as string,
@@ -70,6 +73,9 @@ export default function GameScreen() {
     switch (gameData.type) {
       case "draw":
         return <DrawPointGame {...gameProps} />;
+      case "measure":
+        // Now MeasureLengthGame accepts props like other components
+        return <MeasureLengthGame {...gameProps} />;
       case "addition":
         return <AdditionGame {...gameProps} />;
       case "subtraction":
