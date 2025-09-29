@@ -101,7 +101,7 @@ export default function ToanHinh() {
         <View style={styles.div1}>
           <View style={{ width:'100%', flexDirection: 'row', justifyContent:'space-between',alignItems:'center',paddingHorizontal: 15,paddingVertical: 5 }}>
             <BackButton style={{ alignSelf: 'flex-start', marginBottom: 8 }} />
-            <Music list="gameHinh1" onReady={(api:any) => (musicRef.current = api)} />
+            <Music list="index" onReady={(api:any) => (musicRef.current = api)} />
           </View>
           <Animated.Text style={[styles.header, { color: headerColor }]}>
             HÌNH HỌC LỚP 1

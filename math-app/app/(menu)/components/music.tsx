@@ -3,7 +3,7 @@ import { Audio } from "expo-av";
 import { View, Image, TouchableOpacity, StyleSheet } from "react-native";
 
 type MusicProps = {
-  list?: "gameHinh1" | "gameHinh2";
+  list?: "gameHinh1" | "gameHinh2" | "index";
   onReady?: (api: {
     toggleMusic: () => Promise<void>;
     stopMusic: () => Promise<void>;
@@ -19,6 +19,9 @@ export default function Music({ list = "gameHinh1", onReady }: MusicProps) {
 
   // Danh sách nhạc theo list
   const tracks: Record<string, any[]> = {
+    index: [
+      require("../../../assets/audios/B2111885/intro.mp3"),
+    ],
     gameHinh1: [
       require("../../../assets/audios/B2111885/backgroundGame1.mp3"),
       require("../../../assets/audios/B2111885/backgroundGame1_2.mp3"),
