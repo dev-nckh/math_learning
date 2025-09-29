@@ -435,38 +435,41 @@ const GameHinh1: React.FC = () => {
           </View>
         )}
 
-        {isGameOver && (
-          <View style={styles.countdownOverlay}>
-            <View style={styles.countdownBox}>
-              <Text style={styles.countdownText}>Bạn đã thua!</Text>
-              <View style={{ flexDirection: 'row', marginTop: 20 }}>
-                <TouchableOpacity
-                  style={{
-                    backgroundColor: '#E65100',
-                    paddingHorizontal: 32,
-                    paddingVertical: 12,
-                    borderRadius: 12,
-                    marginRight: 16,
-                  }}
-                  onPress={handleRestart}
-                >
-                  <Text style={{ color: '#fff', fontSize: 20, fontWeight: 'bold' }}>Chơi lại</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={{
-                    backgroundColor: '#388E3C',
-                    paddingHorizontal: 32,
-                    paddingVertical: 12,
-                    borderRadius: 12,
-                  }}
-                  onPress={() => router.back()}
-                >
-                  <Text style={{ color: '#fff', fontSize: 20, fontWeight: 'bold' }}>Trở về</Text>
-                </TouchableOpacity>
-              </View>
+      {isGameOver && (
+        <View style={styles.countdownOverlay}>
+          <View style={styles.countdownBox}>
+            {/* Tiêu đề Game Over */}
+            <Text style={styles.gameOverTitle}>Trò Chơi Kết Thúc!</Text>
+
+            {/* Hình gif nhân vật */}
+            <Image
+              source={require('../../../assets/images/B2111885/character/dog_bye.gif')}
+              style={styles.gameOverImage}
+            />
+
+            {/* Điểm số */}
+            <Text style={styles.gameOverScore}>Điểm: {score}</Text>
+
+            {/* Hai nút */}
+            <View style={styles.buttonRow}>
+              <TouchableOpacity
+                style={[styles.gameOverButton, { backgroundColor: '#E65100' }]}
+                onPress={handleRestart}
+              >
+                <Text style={styles.buttonText}>Chơi lại</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.gameOverButton, { backgroundColor: '#388E3C' }]}
+                onPress={() => router.back()}
+              >
+                <Text style={styles.buttonText}>Trở về</Text>
+              </TouchableOpacity>
             </View>
           </View>
-        )}
+        </View>
+      )}
+
       </View>
     </ImageBackground>
   );
@@ -643,6 +646,40 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 2,
   },
+  gameOverTitle: {
+  fontSize: 32,
+  fontWeight: 'bold',
+  color: '#E65100',
+  textAlign: 'center',
+  },
+  gameOverImage: {
+    width: 200,
+    height: 200,
+    marginBottom:5,
+  },
+  gameOverScore: {
+    fontSize: 28,
+    color: '#E65100',
+    fontWeight: 'bold',
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  gameOverButton: {
+    paddingHorizontal: 32,
+    paddingVertical: 12,
+    borderRadius: 12,
+    marginHorizontal: 8,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+
 });
 
 export default GameHinh1;

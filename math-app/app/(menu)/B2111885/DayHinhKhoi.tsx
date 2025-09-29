@@ -38,7 +38,7 @@ const HINH_KHOI_LIST = [
   },
   {
     name: 'Hình hộp chữ nhật',
-    desc: 'Hình hộp chữ nhật có 6 mặt là hình chữ nhật.',
+    desc: 'Hình hộp chữ nhật có 4 mặt là hình chữ nhật và có 2 mặt đáy là hình chữ vuông.',
     renderShape: () => {
       const colors = [
         0xff6666, // đỏ
@@ -57,7 +57,7 @@ const HINH_KHOI_LIST = [
   },
   {
     name: 'Hình trụ',
-    desc: 'Hình trụ có hai đáy là hình tròn và một mặt cong.',
+    desc: 'Hình trụ có hai đáy là hình tròn và mặt bên là một hình chữ nhật to được uốn cong.',
     renderShape: () => {
       const colors = [
         0xff6666, // mặt đáy 1 (đỏ)
@@ -123,7 +123,7 @@ const HINH_KHOI_LIST = [
 },
 {
   name: 'Hình cầu',
-  desc: 'Hình cầu là hình tròn 3D, mọi điểm trên mặt đều cách tâm một khoảng bằng nhau.',
+  desc: 'Hình cầu là hình mà ta nhìn mọi hướng đều thấy nó có hình tròn.',
   renderShape: () => {
     // Quả cầu mịn
     const material = new THREE.MeshPhongMaterial({

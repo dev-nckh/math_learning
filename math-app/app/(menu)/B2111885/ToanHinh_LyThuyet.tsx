@@ -96,7 +96,7 @@ export default function ToanHinh_LyThuyet() {
 
   return (
     <ImageBackground
-      source={require('../../../assets/images/B2111885/main_background.jpg')}
+      source={require('../../../assets/images/B2111885/main_background3.jpg')}
       style={styles.container}
       resizeMode="cover"
     >

@@ -184,7 +184,7 @@ export default function TroChoiHinhHoc() {
 
   return (
     <ImageBackground
-      source={require('../../../assets/images/B2111885/main_background.jpg')}
+      source={require('../../../assets/images/B2111885/main_background4.jpg')}
       style={styles.container}
       resizeMode="cover"
     >
@@ -203,7 +203,7 @@ export default function TroChoiHinhHoc() {
           </View>
         </View>
         <Animated.Image
-          source={require('../../../assets/images/B2111885/character/dog_point.gif')}
+          source={require('../../../assets/images/B2111885/character/dog_quiz_time.gif')}
           style={[styles.gif, { transform: [{ rotate }] }]}
         />
       </View>
