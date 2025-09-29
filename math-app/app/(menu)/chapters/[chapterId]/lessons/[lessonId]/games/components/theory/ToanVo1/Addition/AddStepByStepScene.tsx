@@ -14,7 +14,7 @@ import {
 import ConfettiCannon from "react-native-confetti-cannon";
 import { useNavigation } from "@react-navigation/native";
 import { router } from "expo-router";
-import * as Speech from "expo-speech";
+import { useSpeech } from "../../useSpeechHook";
 import { FontAwesome5 } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
@@ -62,7 +62,11 @@ export default function AddStepByStepScene({
   const characterAnim = useRef(new Animated.Value(0)).current;
 
   // Thêm state để quản lý âm thanh
-  const [speaking, setSpeaking] = useState(false);
+  const { speak, stopSpeech, isSpeechActive, pageId } = useSpeech({
+    pageId: "AddStepByStepScene",
+    autoCleanupOnUnmount: true,
+    autoStopOnBlur: true,
+  });
 
   // Các animated values cho hiệu ứng lắc lư hình ảnh
   const [fruitAnimValues, setFruitAnimValues] = useState<
@@ -100,36 +104,6 @@ export default function AddStepByStepScene({
     pitch: 1.1, // Cao độ (0.5-2.0)
     rate: 0.75, // Tốc độ chậm để trẻ hiểu rõ (0.1-2.0)
     volume: 1.0, // Âm lượng (0-1.0)
-  };
-
-  // Hàm đọc văn bản
-  const speak = async (
-    text: string,
-    options = {},
-    callback: (() => void) | null = null
-  ) => {
-    if (speaking) {
-      await Speech.stop();
-      setSpeaking(false);
-      return;
-    }
-
-    setSpeaking(true);
-
-    try {
-      await Speech.speak(text, {
-        ...speechOptions,
-        ...options,
-        onDone: () => {
-          setSpeaking(false);
-          if (callback) callback(); // Gọi callback khi giọng nói hoàn thành
-        },
-        onError: () => setSpeaking(false),
-      });
-    } catch (error) {
-      console.error("Lỗi phát âm thanh:", error);
-      setSpeaking(false);
-    }
   };
 
   // Điều chỉnh kích thước hình ảnh lớn hơn
@@ -257,7 +231,7 @@ export default function AddStepByStepScene({
 
     return () => {
       clearTimeout(timer);
-      Speech.stop();
+      stopSpeech();
     };
   }, [number1, number2]);
 
@@ -439,8 +413,7 @@ export default function AddStepByStepScene({
   // Thêm vào hàm generateNewExample
   const generateNewExample = () => {
     // Dừng speech đang phát nếu có
-    Speech.stop();
-    setSpeaking(false);
+    stopSpeech();
 
     // Hiển thị confetti
     setShowConfetti(true);
@@ -536,28 +509,21 @@ export default function AddStepByStepScene({
 
   // Tự động đọc giải thích theo từng bước
   useEffect(() => {
-    if (currentStep === 1) {
-      setTimeout(() => {
-        speak(
-          `Bước 1: Cộng phần đơn vị. ${donvi1} cộng ${donvi2} bằng ${donviSum}. Viết ${donviSum} vào hàng đơn vị của kết quả.`,
-          {},
-          () => {
-            // Chuyển sang bước tiếp theo sau khi giọng nói hoàn thành
-            setCurrentStep(2);
-          }
+    const speakStep = async () => {
+      if (currentStep === 1) {
+        await speak(
+          `Bước 1: Cộng phần đơn vị. ${donvi1} cộng ${donvi2} bằng ${donviSum}. Viết ${donviSum} vào hàng đơn vị của kết quả.`
         );
-      }, 300); // Delay 300ms trước khi bắt đầu bước 1
-    } else if (currentStep === 2) {
-      setTimeout(() => {
-        speak(
-          `Bước 2: Cộng phần chục. ${chuc1} cộng ${chuc2} bằng ${chucSum}. Viết ${chucSum} vào hàng chục của kết quả. Vậy ${number1} cộng ${number2} bằng ${sum}.`,
-          {},
-          () => {
-            // Kết thúc hoặc thực hiện hành động khác sau bước cuối
-            console.log("Hoàn thành tất cả các bước!");
-          }
+        setCurrentStep(2);
+      } else if (currentStep === 2) {
+        await speak(
+          `Bước 2: Cộng phần chục. ${chuc1} cộng ${chuc2} bằng ${chucSum}. Viết ${chucSum} vào hàng chục của kết quả. Vậy ${number1} cộng ${number2} bằng ${sum}.`
         );
-      }, 300); // Delay 300ms trước khi bắt đầu bước 2
+        // ...hoặc set trạng thái hoàn thành...
+      }
+    };
+    if (currentStep === 1 || currentStep === 2) {
+      speakStep();
     }
   }, [currentStep]);
 
@@ -573,8 +539,7 @@ export default function AddStepByStepScene({
   const handleNext = async () => {
     try {
       // Dừng giọng nói hiện tại trước khi chuyển bước
-      await Speech.stop();
-      setSpeaking(false);
+      await stopSpeech();
       console.log("🛑 Speech stopped before next transition");
     } catch (error) {
       console.warn("Error stopping speech in handleNext:", error);
@@ -623,10 +588,10 @@ export default function AddStepByStepScene({
             activeOpacity={0.8}
           >
             <FontAwesome5
-              name={speaking ? "volume-up" : "volume-up"}
+              name={isSpeechActive() ? "volume-up" : "volume-up"}
               size={16}
-              color={speaking ? "#FF6B95" : "#E65100"}
-              style={speaking ? styles.speakingIcon : {}}
+              color={isSpeechActive() ? "#FF6B95" : "#E65100"}
+              style={isSpeechActive() ? styles.speakingIcon : {}}
             />
           </TouchableOpacity>
         </Animated.View>
@@ -792,8 +757,8 @@ export default function AddStepByStepScene({
 
           <TouchableOpacity
             style={styles.practiceButton}
-            onPress={() => {
-              Speech.stop();
+            onPress={async () => {
+              await stopSpeech();
               router.push("./AdditionPracticeScene");
             }}
           >

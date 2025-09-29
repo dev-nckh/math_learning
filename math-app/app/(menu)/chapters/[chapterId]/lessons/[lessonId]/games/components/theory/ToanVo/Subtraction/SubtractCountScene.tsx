@@ -30,7 +30,7 @@ import useImagePreload from "../hooks/useImagePreload";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { Shadow } from "react-native-shadow-2";
-import * as Speech from "expo-speech";
+import { useSpeech } from "../../useSpeechHook";
 
 const { width, height } = Dimensions.get("window");
 const MELON = require("../../../../../../../../../../../assets/images/ToanVo/images/watermelon.png");
@@ -224,8 +224,11 @@ const SubtractMelonScene = () => {
     count: false,
     quiz: false,
   });
-  const [speaking, setSpeaking] = useState(false);
-
+  const { speak, stopSpeech, isSpeechActive, pageId } = useSpeech({
+    pageId: "SubtractMelonScene",
+    autoCleanupOnUnmount: true,
+    autoStopOnBlur: true,
+  });
   // Animation references
   const titleOpacity = useRef(new RNAnimated.Value(0)).current;
   const contentOpacity = useRef(new RNAnimated.Value(0)).current;
@@ -242,12 +245,12 @@ const SubtractMelonScene = () => {
   const owlScaleY = useRef(new RNAnimated.Value(1)).current;
 
   // Cấu hình giọng nói
-  const speechOptions = {
-    language: "vi-VN",
-    pitch: 1.1, // Cao độ (0.5-2.0)
-    rate: 0.9, // Tốc độ (0.1-2.0)
-    volume: 1.0, // Âm lượng (0-1.0)
-  };
+  // const speechOptions = {
+  //   language: "vi-VN",
+  //   pitch: 1.1, // Cao độ (0.5-2.0)
+  //   rate: 0.9, // Tốc độ (0.1-2.0)
+  //   volume: 1.0, // Âm lượng (0-1.0)
+  // };
 
   // Reanimated values
   const opacity1 = useSharedValue(0);
@@ -276,94 +279,94 @@ const SubtractMelonScene = () => {
   }));
 
   // Hàm đọc văn bản
-  const speak = async (text: string, options = {}) => {
-    if (speaking) {
-      await Speech.stop();
-      setSpeaking(false);
-      return;
-    }
+  // const speak = async (text: string, options = {}) => {
+  //   if (speaking) {
+  //     await Speech.stop();
+  //     setSpeaking(false);
+  //     return;
+  //   }
 
-    setSpeaking(true);
+  //   setSpeaking(true);
 
-    try {
-      await Speech.speak(text, {
-        ...speechOptions,
-        ...options,
-        onDone: () => setSpeaking(false),
-        onError: () => setSpeaking(false),
-      });
+  //   try {
+  //     await Speech.speak(text:string, {
+  //       ...speechOptions,
+  //       ...options,
+  //       onDone: () => setSpeaking(false),
+  //       onError: () => setSpeaking(false),
+  //     });
 
-      // Hiệu ứng lắc lư nâng cao khi đang nói
-      if (speaking) {
-        // Tạo animation lắc lư tự nhiên, nhanh hơn khi nói
-        RNAnimated.loop(
-          RNAnimated.sequence([
-            // Lắc qua phải + nhún xuống nhẹ khi nói
-            RNAnimated.parallel([
-              RNAnimated.timing(owlSwayX, {
-                toValue: 4,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              RNAnimated.timing(owlRotate, {
-                toValue: 0.05,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              RNAnimated.timing(owlBounceY, {
-                toValue: 2,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              RNAnimated.timing(owlScaleY, {
-                toValue: 0.97,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              RNAnimated.timing(owlScaleX, {
-                toValue: 1.03,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-            ]),
+  //     // Hiệu ứng lắc lư nâng cao khi đang nói
+  //     if (speaking) {
+  //       // Tạo animation lắc lư tự nhiên, nhanh hơn khi nói
+  //       RNAnimated.loop(
+  //         RNAnimated.sequence([
+  //           // Lắc qua phải + nhún xuống nhẹ khi nói
+  //           RNAnimated.parallel([
+  //             RNAnimated.timing(owlSwayX, {
+  //               toValue: 4,
+  //               duration: 200,
+  //               useNativeDriver: true,
+  //             }),
+  //             RNAnimated.timing(owlRotate, {
+  //               toValue: 0.05,
+  //               duration: 200,
+  //               useNativeDriver: true,
+  //             }),
+  //             RNAnimated.timing(owlBounceY, {
+  //               toValue: 2,
+  //               duration: 200,
+  //               useNativeDriver: true,
+  //             }),
+  //             RNAnimated.timing(owlScaleY, {
+  //               toValue: 0.97,
+  //               duration: 200,
+  //               useNativeDriver: true,
+  //             }),
+  //             RNAnimated.timing(owlScaleX, {
+  //               toValue: 1.03,
+  //               duration: 200,
+  //               useNativeDriver: true,
+  //             }),
+  //           ]),
 
-            // Lắc qua trái + nhún lên
-            RNAnimated.parallel([
-              RNAnimated.timing(owlSwayX, {
-                toValue: -4,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              RNAnimated.timing(owlRotate, {
-                toValue: -0.05,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              RNAnimated.timing(owlBounceY, {
-                toValue: -2,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              RNAnimated.timing(owlScaleY, {
-                toValue: 1.03,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              RNAnimated.timing(owlScaleX, {
-                toValue: 0.97,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-            ]),
-          ]),
-          { iterations: 10 }
-        ).start();
-      }
-    } catch (error) {
-      console.error("Lỗi phát âm thanh:", error);
-      setSpeaking(false);
-    }
-  };
+  //           // Lắc qua trái + nhún lên
+  //           RNAnimated.parallel([
+  //             RNAnimated.timing(owlSwayX, {
+  //               toValue: -4,
+  //               duration: 200,
+  //               useNativeDriver: true,
+  //             }),
+  //             RNAnimated.timing(owlRotate, {
+  //               toValue: -0.05,
+  //               duration: 200,
+  //               useNativeDriver: true,
+  //             }),
+  //             RNAnimated.timing(owlBounceY, {
+  //               toValue: -2,
+  //               duration: 200,
+  //               useNativeDriver: true,
+  //             }),
+  //             RNAnimated.timing(owlScaleY, {
+  //               toValue: 1.03,
+  //               duration: 200,
+  //               useNativeDriver: true,
+  //             }),
+  //             RNAnimated.timing(owlScaleX, {
+  //               toValue: 0.97,
+  //               duration: 200,
+  //               useNativeDriver: true,
+  //             }),
+  //           ]),
+  //         ]),
+  //         { iterations: 10 }
+  //       ).start();
+  //     }
+  //   } catch (error) {
+  //     console.error("Lỗi phát âm thanh:", error);
+  //     setSpeaking(false);
+  //   }
+  // };
 
   // Tạo hiệu ứng lắc lư tự nhiên cho chú cú
   const startOwlWobble = () => {
@@ -754,12 +757,11 @@ const SubtractMelonScene = () => {
     ]).start();
   };
 
-  const handleReload = () => {
+  const handleReload = async () => {
     animateButton(reloadButtonScale);
 
     // Dừng âm thanh trước khi reload
-    Speech.stop();
-    setSpeaking(false);
+    await stopSpeech();
 
     // Reset các animation values
     owlSwayX.setValue(0);
@@ -956,10 +958,10 @@ const SubtractMelonScene = () => {
                   activeOpacity={0.8}
                 >
                   <FontAwesome5
-                    name={speaking ? "volume-up" : "volume-up"}
+                    name={isSpeechActive() ? "volume-up" : "volume-up"}
                     size={16}
-                    color={speaking ? "#FF6B95" : "#666"}
-                    style={speaking ? styles.speakingIcon : {}}
+                    color={isSpeechActive() ? "#FF6B95" : "#666"}
+                    style={isSpeechActive() ? styles.speakingIcon : {}}
                   />
                 </TouchableOpacity>
               </Shadow>
@@ -1044,11 +1046,11 @@ const SubtractMelonScene = () => {
                     >
                       <View style={styles.quizContent}>
                         <Text style={styles.quizTitle}>
-                          Vậy Cú còn mấy quả dưa?
+                          Vậy Cú còn mấy miếng dưa?
                         </Text>
                         <TouchableOpacity
                           style={styles.equation}
-                          onPress={() => speak("7 trừ 3 bằng mấy?")}
+                          onPress={async () => await speak("7 trừ 3 bằng mấy?")}
                         >
                           <Text style={styles.equationText}>7 - 3 = ?</Text>
                           <FontAwesome5
@@ -1089,10 +1091,10 @@ const SubtractMelonScene = () => {
             >
               <TouchableOpacity
                 style={styles.circleButton}
-                onPress={() => {
+                onPress={async () => {
                   animateButton(backButtonScale);
                   // Dừng âm thanh trước khi chuyển trang
-                  Speech.stop();
+                  await stopSpeech();
                   setTimeout(() => router.back(), 300);
                 }}
                 activeOpacity={0.8}
