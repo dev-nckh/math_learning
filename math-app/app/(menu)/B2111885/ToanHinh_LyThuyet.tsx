@@ -85,7 +85,7 @@ export default function ToanHinh_LyThuyet() {
   const [bounceStyle2, triggerBounce2] = useBounceYEffect();
   const [bounceStyle3, triggerBounce3] = useBounceYEffect();
   const [bounceStyle4, triggerBounce4] = useBounceYEffect();
-  const [bounceStyle5, triggerBounce5] = useBounceYEffect();
+
 
   const handlePress = (type: string, triggerBounce: () => void) => {
     triggerBounce();
@@ -178,7 +178,7 @@ export default function ToanHinh_LyThuyet() {
 
         {/* Box Hình Khối */}
         <TouchableOpacity style={styles.box5}  onPress={() => router.push('/(menu)/B2111885/DayHinhKhoi')}>
-          <Animated.View style={[{ flex: 1, flexDirection: 'row' }, bounceStyle5]}>
+          <Animated.View style={[{ flex: 1, flexDirection: 'row' }]}>
             <Image
               source={require('../../../assets/images/B2111885/background_button4.jpg')}
               style={styles.boxBg}
@@ -188,6 +188,9 @@ export default function ToanHinh_LyThuyet() {
               <GlowingText style={styles.labelBig}>Hình Khối</GlowingText>
             </View>
             <View style={styles.boxItemRight} />
+            <Image source={require('../../../assets/images/B2111885/hinhkhoi.jpg')}
+            style={{ width: 80, height: 80, alignSelf: 'center',right: 16 }}
+            />
           </Animated.View>
         </TouchableOpacity>
       </View>

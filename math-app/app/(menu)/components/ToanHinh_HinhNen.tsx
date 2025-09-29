@@ -7,6 +7,8 @@ type Props = {
 };
 
 const backgrounds = [
+
+  require('../../../assets/images/B2111885/Game2/BackGround/GameHinh2_BG0.jpg'),
   require('../../../assets/images/B2111885/Game2/BackGround/GameHinh2_BG1.jpg'),
   require('../../../assets/images/B2111885/Game2/BackGround/GameHinh2_BG2.jpg'),
   require('../../../assets/images/B2111885/Game2/BackGround/GameHinh2_BG3.jpg'),
@@ -15,6 +17,8 @@ const backgrounds = [
   require('../../../assets/images/B2111885/Game2/BackGround/GameHinh2_BG6.jpg'),
   require('../../../assets/images/B2111885/Game2/BackGround/GameHinh2_BG7.jpg'),
   require('../../../assets/images/B2111885/Game2/BackGround/GameHinh2_BG8.jpg'),
+  require('../../../assets/images/B2111885/Game2/BackGround/GameHinh2_BG9.jpg'),
+  require('../../../assets/images/B2111885/Game2/BackGround/GameHinh2_BG10.jpg'),
 ];
 
 const ToanHinh_HinhNen: React.FC<Props> = ({ onSelect, selected }) => {

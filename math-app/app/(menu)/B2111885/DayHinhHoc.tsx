@@ -14,14 +14,13 @@ const TITLES: Record<string, string> = {
   square: "Bài Học Về Hình Vuông",
   triangle: "Bài Học Về Hình Tam Giác",
   rectangle: "Bài Học Về Hình Chữ Nhật",
-  solid: "Bài Học Về Hình Khối",
 };
 
 const SHAPE_BACKGROUNDS: Record<string, any> = {
-  circle: require('../../../assets/images/B2111885/main_background.jpg'),
-  square: require('../../../assets/images/B2111885/game_background.jpg'),
-  triangle: require('../../../assets/images/B2111885/main_background.jpg'),
-  rectangle: require('../../../assets/images/B2111885/main_background.jpg'),
+  circle: require('../../../assets/images/B2111885/main_background2.jpg'),
+  square: require('../../../assets/images/B2111885/main_background3.jpg'),
+  triangle: require('../../../assets/images/B2111885/main_background4.jpg'),
+  rectangle: require('../../../assets/images/B2111885/main_background5.jpg'),
   // Nếu sau này có hình riêng thì thay đường dẫn ở đây
 };
 

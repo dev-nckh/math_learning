@@ -45,6 +45,98 @@ function FlashingScore({ children, style }: { children: React.ReactNode, style?:
   );
 }
 
+// Component Box với hiệu ứng dao động
+function GameBox({ 
+  title, 
+  backgroundImage, 
+  highScore, 
+  showReset = false, 
+  onPress, 
+  onReset 
+}: { 
+  title: string; 
+  backgroundImage: any; 
+  highScore?: number; 
+  showReset?: boolean; 
+  onPress: () => void; 
+  onReset?: () => void; 
+}) {
+  // Hiệu ứng dao động nhẹ
+  const floatAnim = useRef(new Animated.Value(0)).current;
+  
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(floatAnim, {
+          toValue: 1,
+          duration: 2000,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+        Animated.timing(floatAnim, {
+          toValue: 0,
+          duration: 2000,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
+
+  const translateY = floatAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -8], // Dao động lên xuống 8px
+  });
+
+  const scale = floatAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 1.02], // Phóng to nhẹ khi lên cao
+  });
+
+  return (
+    <Animated.View style={{ transform: [{ translateY }, { scale }] }}>
+      <TouchableOpacity style={styles.box} onPress={onPress}>
+        <Image
+          source={backgroundImage}
+          style={styles.boxBg}
+          resizeMode="cover"
+        />
+        {/* Tiêu đề nằm trên cùng */}
+        <View style={styles.titleContainer}>
+          <Text style={styles.titleText}>{title}</Text>
+        </View>
+        
+        <View style={styles.contentContainer}>
+          <View style={styles.leftContent}>
+            {showReset && highScore !== undefined && (
+              <FlashingScore style={styles.highScoreText}>
+                Kỷ lục: {highScore}
+              </FlashingScore>
+            )}
+          </View>
+          <View style={styles.rightContent}>
+            {/* Để trống cho item khác */}
+          </View>
+        </View>
+
+        {/* Nút reset điểm */}
+        {showReset && (
+          <TouchableOpacity
+            style={styles.resetButton}
+            onPress={(e) => {
+              e.stopPropagation();
+              onReset?.();
+            }}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.resetButtonText}>Reset</Text>
+          </TouchableOpacity>
+        )}
+      </TouchableOpacity>
+    </Animated.View>
+  );
+}
+
 export default function TroChoiHinhHoc() {
   const router = useRouter();
   const [highScore, setHighScore] = React.useState(0);
@@ -71,6 +163,24 @@ export default function TroChoiHinhHoc() {
     inputRange: [0, 0.5, 1],
     outputRange: ['-10deg', '10deg', '-10deg'],
   });
+
+  const handleResetScore = async () => {
+    Alert.alert(
+      'Xác nhận',
+      'Bạn có chắc muốn đặt lại điểm kỷ lục?',
+      [
+        { text: 'Hủy', style: 'cancel' },
+        {
+          text: 'Đồng ý',
+          style: 'destructive',
+          onPress: async () => {
+            await AsyncStorage.setItem('mathgame_high_score', '0');
+            setHighScore(0);
+          },
+        },
+      ]
+    );
+  };
 
   return (
     <ImageBackground
@@ -101,65 +211,21 @@ export default function TroChoiHinhHoc() {
       {/* div2: Các box trò chơi */}
       <View style={styles.div2}>
         {/* Box trò chơi 1 */}
-        <TouchableOpacity style={styles.box}
+        <GameBox
+          title="Rổ Hình Vui Nhộn"
+          backgroundImage={require('../../../assets/images/B2111885/GameHungHinh.png')}
+          highScore={highScore}
+          showReset={true}
           onPress={() => router.push('/(menu)/B2111885/GameHinh1')}
-        >
-          <Image
-            source={require('../../../assets/images/B2111885/background_button3.jpg')}
-            style={styles.boxBg}
-            resizeMode="cover"
-          />
-          <View style={styles.boxItemLeft}>
-            <Text style={styles.labelBig}>Rổ Hình Vui Nhộn</Text>
-            <FlashingScore style={styles.highScoreText}>
-              Kỷ lục: {highScore}
-            </FlashingScore>
-          </View>
-          <View style={styles.boxItemRight}>
-            {/* Để trống cho item khác */}
-          </View>
-          {/* Nút reset điểm */}
-          <TouchableOpacity
-            style={styles.resetButton}
-            onPress={(e) => {
-              e.stopPropagation();
-              Alert.alert(
-                'Xác nhận',
-                'Bạn có chắc muốn đặt lại điểm kỷ lục?',
-                [
-                  { text: 'Hủy', style: 'cancel' },
-                  {
-                    text: 'Đồng ý',
-                    style: 'destructive',
-                    onPress: async () => {
-                      await AsyncStorage.setItem('mathgame_high_score', '0');
-                      setHighScore(0);
-                    },
-                  },
-                ]
-              );
-            }}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.resetButtonText}>Reset</Text>
-          </TouchableOpacity>
-        </TouchableOpacity>
+          onReset={handleResetScore}
+        />
 
         {/* Box trò chơi 2 */}
-        <TouchableOpacity style={styles.box}
-        onPress={() => router.push('/(menu)/B2111885/GameHinh2')}
-        >
-          <Image
-            source={require('../../../assets/images/B2111885/background_button3.jpg')}
-            style={styles.boxBg}
-            resizeMode="cover"
-          />
-          <View style={styles.boxItemLeft}>
-            <Text style={styles.labelBig}>Ghép Hình Vui Vui</Text>
-            <Text style={styles.highScoreText}></Text>
-          </View>
-          <View style={styles.boxItemRight} />
-        </TouchableOpacity>
+        <GameBox
+          title="Ghép Hình"
+          backgroundImage={require('../../../assets/images/B2111885/GameXepHinh.png')}
+          onPress={() => router.push('/(menu)/B2111885/GameHinh2')}
+        />
       </View>
     </ImageBackground>
   );
@@ -179,7 +245,7 @@ const styles = StyleSheet.create({
   },
   speechContainer: {
     flex: 1.2,
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'center',
   },
   speechBubble: {
@@ -211,10 +277,9 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   box: {
-    flexDirection: 'row',
     alignItems: 'center',
-    height: "36%", // tăng chiều cao cho cân đối khi chỉ có 2 box
-    width: '88%',
+    height: 210, 
+    width: SCREEN_WIDTH * 0.88,
     backgroundColor: '#FFF9C4',
     borderRadius: 22,
     marginVertical: 16,
@@ -223,41 +288,56 @@ const styles = StyleSheet.create({
     shadowOpacity: 1,
     shadowRadius: 16,
     elevation: 32,
-    borderWidth: 2,
+    borderWidth: 5,
     borderColor: '#F9A825',
     position: 'relative',
     overflow: 'hidden',
   },
   boxBg: {
+    width: '100%',
+    height: '100%',
     ...StyleSheet.absoluteFillObject,
-    opacity: 0.65,
     zIndex: 0,
+    resizeMode: 'cover',
   },
-  boxItemLeft: {
-    flex: 7,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    paddingLeft: '7%',
+  titleContainer: {
+    width: '100%',
+    height: 50,
+    backgroundColor: '#FFF9C4',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: 2,
+    borderBottomColor: '#F9A825',
     zIndex: 1,
   },
-  boxItemRight: {
+  titleText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#000000',
+    textAlign: 'center',
+  },
+  contentContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    width: '100%',
+    paddingHorizontal: 16,
+    zIndex: 1,
+  },
+  leftContent: {
+    flex: 7,
+    justifyContent: 'flex-end',
+    alignItems: 'flex-start',
+    paddingBottom: 10,
+    paddingLeft: 10,
+  },
+  rightContent: {
     flex: 3,
     justifyContent: 'center',
     alignItems: 'flex-end',
-    paddingRight: 16,
-    zIndex: 1,
-  },
-  labelBig: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#444',
-    marginBottom: 6,
   },
   highScoreText: {
     fontSize: 22,
-    marginTop: 2,
     fontWeight: 'bold',
-    paddingBottom: "1%",
   },
   resetButton: {
     position: 'absolute',
@@ -276,4 +356,3 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
 });
-

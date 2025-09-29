@@ -6,14 +6,21 @@ type Props = {
 };
 
 const stickers = [
-  require('../../../assets/images/B2111885/Game2/Sticker/GameHinh2_SK1.png'),
-  require('../../../assets/images/B2111885/Game2/Sticker/GameHinh2_SK2.jpg'),
-  require('../../../assets/images/B2111885/Game2/Sticker/GameHinh2_SK3.jpg'),
-  require('../../../assets/images/B2111885/Game2/Sticker/GameHinh2_SK4.jpg'),
-  require('../../../assets/images/B2111885/Game2/Sticker/GameHinh2_SK5.jpg'),
-  require('../../../assets/images/B2111885/Game2/Sticker/GameHinh2_SK6.jpg'),
-  require('../../../assets/images/B2111885/Game2/Sticker/GameHinh2_SK7.jpg'),
-  require('../../../assets/images/B2111885/Game2/Sticker/GameHinh2_SK8.jpg'),
+  require('../../../assets/images/B2111885/Game2/Sticker/GameHinh2_1.png'),
+  require('../../../assets/images/B2111885/Game2/Sticker/GameHinh2_2.jpg'),
+  require('../../../assets/images/B2111885/Game2/Sticker/GameHinh2_3.jpg'),
+  require('../../../assets/images/B2111885/Game2/Sticker/GameHinh2_4.png'),
+  require('../../../assets/images/B2111885/Game2/Sticker/GameHinh2_5.png'),
+  require('../../../assets/images/B2111885/Game2/Sticker/GameHinh2_6.jpg'),
+  require('../../../assets/images/B2111885/Game2/Sticker/GameHinh2_7.png'),
+  require('../../../assets/images/B2111885/Game2/Sticker/GameHinh2_8.png'),
+  require('../../../assets/images/B2111885/Game2/Sticker/GameHinh2_9.png'),
+  require('../../../assets/images/B2111885/Game2/Sticker/GameHinh2_10.jpg'),
+  require('../../../assets/images/B2111885/Game2/Sticker/GameHinh2_11.jpg'),
+  require('../../../assets/images/B2111885/Game2/Sticker/GameHinh2_12.jpg'),
+  require('../../../assets/images/B2111885/Game2/Sticker/GameHinh2_13.jpg'),
+  require('../../../assets/images/B2111885/Game2/Sticker/GameHinh2_14.png'),
+  require('../../../assets/images/B2111885/Game2/Sticker/GameHinh2_15.jpg'),
 ];
 
 const ToanHinh_NhanDan: React.FC<Props> = ({ onSelect }) => {

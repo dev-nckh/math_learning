@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useRef } from 'react';
 import { Animated, Dimensions, Easing, Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import BackButton from '../components/backButton';
+import Music from '../components/music';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const BUTTON_SIZE = SCREEN_WIDTH * 0.35; 
 const GIF_SIZE = SCREEN_WIDTH * 0.65;   
@@ -11,7 +12,7 @@ const H_MARGIN = SCREEN_WIDTH * 0.05;
 
 export default function ToanHinh() {
   const router = useRouter(); 
-
+  const musicRef = useRef<any>(null);
 
   const anims = [
     useRef(new Animated.Value(0)).current,
@@ -88,6 +89,7 @@ export default function ToanHinh() {
     outputRange: ['#ff9800', '#fff176'],
   });
 
+
   return (
     <ImageBackground
       source={require('../../../assets/images/B2111885/main_background.jpg')}
@@ -97,7 +99,10 @@ export default function ToanHinh() {
       <View style={styles.content}>
         {/* Div 1: Tiêu đề */}
         <View style={styles.div1}>
-          <BackButton style={{ alignSelf: 'flex-start', marginBottom: 8 }} />
+          <View style={{ width:'100%', flexDirection: 'row', justifyContent:'space-between',alignItems:'center',paddingHorizontal: 15,paddingVertical: 5 }}>
+            <BackButton style={{ alignSelf: 'flex-start', marginBottom: 8 }} />
+            <Music list="gameHinh1" onReady={(api:any) => (musicRef.current = api)} />
+          </View>
           <Animated.Text style={[styles.header, { color: headerColor }]}>
             HÌNH HỌC LỚP 1
           </Animated.Text>
@@ -129,12 +134,18 @@ export default function ToanHinh() {
 
         <View style={styles.div4}>
           {/* Nút bắt đầu */}
-          <TouchableOpacity
-            style={styles.startButton}
-            onPress={() => router.push('/(menu)/B2111885/ToanHinh_LyThuyet')}
-          >
-            <Text style={styles.startButtonText}>Bắt đầu</Text>
-          </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.startButton}
+          onPress={() => {
+              if (musicRef.current) {
+            musicRef.current.stopMusic();
+            }
+            router.push('/(menu)/B2111885/ToanHinh_LyThuyet');
+          }}
+        >
+          <Text style={styles.startButtonText}>Bắt đầu</Text>
+        </TouchableOpacity>
+
           {/* Gif */}
           <Animated.Image
             source={require('../../../assets/images/B2111885/character/dog_point.gif')}
@@ -158,7 +169,11 @@ export default function ToanHinh() {
         >
           <TouchableOpacity
             style={{ width: "100%", height: "100%" }}
-            onPress={() => router.push('/B2111885/TroChoiHinhHoc')}
+            onPress={() => {
+              if (musicRef.current) {
+                musicRef.current.stopMusic();
+              } 
+              router.push('/B2111885/TroChoiHinhHoc')}}
             activeOpacity={0.8}
           >
             <View style={{ width: "95%", height: "45%", alignSelf: 'center', position: 'relative' }}>

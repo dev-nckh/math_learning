@@ -4,7 +4,7 @@ import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
 import * as THREE from 'three';
 import HinhKhoi from '../components/HinhKhoi';
 import BackButton from '../components/backButton';
-
+import Music from '../components/music';
 
 const SHAPE_IMAGES = [
   require('../../../assets/images/B2111885/HinhLapPhuong.png'),
@@ -21,7 +21,14 @@ const HINH_KHOI_LIST = [
     name: 'Hình lập phương',
     desc: 'Hình lập phương là khối có 6 mặt đều là hình vuông bằng nhau.',
     renderShape: () => {
-      const colors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff00ff, 0x00ffff];
+      const colors = [
+        0xff6666, // đỏ
+        0xffb366, // cam
+        0xffff99, // vàng
+        0x99cc99, // xanh lá
+        0x99e6ff, // xanh dương
+        0xcc99ff  // tím
+      ];
       const materials = colors.map(color =>
         new THREE.MeshPhongMaterial({ color, transparent: true, opacity: 0.7, side: THREE.DoubleSide })
       );
@@ -33,11 +40,18 @@ const HINH_KHOI_LIST = [
     name: 'Hình hộp chữ nhật',
     desc: 'Hình hộp chữ nhật có 6 mặt là hình chữ nhật.',
     renderShape: () => {
-      const colors = [0x2196f3, 0x4caf50, 0xff9800, 0xe91e63, 0x9c27b0, 0x607d8b];
+      const colors = [
+        0xff6666, // đỏ
+        0xffb366, // cam
+        0xffff99, // vàng
+        0x99cc99, // xanh lá
+        0x99e6ff, // xanh dương
+        0xcc99ff  // tím
+      ];
       const materials = colors.map(color =>
         new THREE.MeshPhongMaterial({ color, transparent: true, opacity: 0.7, side: THREE.DoubleSide })
       );
-      return new THREE.Mesh(new THREE.BoxGeometry(1.5, 1, 0.7), materials);
+      return new THREE.Mesh(new THREE.BoxGeometry(1.5, 1, 1), materials);
     },
     initialRotation: { x: 0, y: 0.3 } // Chỉ nghiêng theo trục Y
   },
@@ -45,7 +59,11 @@ const HINH_KHOI_LIST = [
     name: 'Hình trụ',
     desc: 'Hình trụ có hai đáy là hình tròn và một mặt cong.',
     renderShape: () => {
-      const colors = [0xff9800, 0x2196f3, 0x4caf50];
+      const colors = [
+        0xff6666, // mặt đáy 1 (đỏ)
+        0xffb366, // mặt cong (cam)
+        0xffff99  // mặt đáy 2 (vàng)
+      ];
       const materials = colors.map(color =>
         new THREE.MeshPhongMaterial({ color, transparent: true, opacity: 0.7, side: THREE.DoubleSide })
       );
@@ -59,8 +77,13 @@ const HINH_KHOI_LIST = [
   name: 'Hình chóp nhọn',
   desc: 'Hình chóp nhọn có đáy là hình vuông và các mặt bên là tam giác.',
   renderShape: () => {
-    const colors = [0xe91e63, 0x2196f3, 0x4caf50, 0xff9800]; // 4 mặt bên
-    const baseColor = 0x9c27b0; // màu đáy
+    const colors = [
+      0xff6666, // đỏ
+      0xcc99ff, // cam
+      0xffff99, // vàng
+      0x99e6ff  // xanh dương
+    ];// 4 mặt bên
+    const baseColor = 0xffb366; // màu đáy
 
     const group = new THREE.Group();
 
@@ -98,35 +121,49 @@ const HINH_KHOI_LIST = [
   },
   initialRotation: { x: 0, y: 0.3 }
 },
-  {
-    name: 'Hình cầu',
-    desc: 'Hình cầu là hình tròn 3D, mọi điểm trên mặt đều cách tâm một khoảng bằng nhau.',
-    renderShape: () => {
-      // Hình cầu mịn
-      const material = new THREE.MeshPhongMaterial({
-        color: 0x9c27b0,
-        transparent: true,
-        opacity: 0.7,
-        side: THREE.DoubleSide
-      });
-      const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.7, 32, 32), material);
+{
+  name: 'Hình cầu',
+  desc: 'Hình cầu là hình tròn 3D, mọi điểm trên mặt đều cách tâm một khoảng bằng nhau.',
+  renderShape: () => {
+    // Quả cầu mịn
+    const material = new THREE.MeshPhongMaterial({
+      color: 0xff6666,
+      transparent: true,
+      opacity: 0.7,
+      side: THREE.DoubleSide
+    });
+    const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.7, 32, 32), material);
 
-      // Hình tròn chia đôi (ở xích đạo)
-      const circleMaterial = new THREE.MeshBasicMaterial({
-        color: 0xffffff,
-        side: THREE.DoubleSide
-      });
-      const circle = new THREE.Mesh(new THREE.CircleGeometry(0.7, 64), circleMaterial);
-      circle.rotation.x = Math.PI / 2; // Đặt nằm ngang
+    // Hình tròn 1 (xích đạo - màu trắng)
+    const circleMaterial1 = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      opacity: 0.7,
+      side: THREE.DoubleSide
+    });
+    const circle1 = new THREE.Mesh(new THREE.CircleGeometry(0.7, 64), circleMaterial1);
+    circle1.rotation.x = Math.PI / 1.7; // Nằm ngang
 
-      // Gom lại thành 1 group
-      const group = new THREE.Group();
-      group.add(sphere);
-      group.add(circle);
+    // Hình tròn 2 (vuông góc với hình 1 - màu xanh)
+    const circleMaterial2 = new THREE.MeshBasicMaterial({
+      color: 0x0000ff, // xanh dương
+      opacity: 0.7,
+      side: THREE.DoubleSide
+    });
+    const circle2 = new THREE.Mesh(new THREE.CircleGeometry(0.7, 64), circleMaterial2);
+    circle2.rotation.y = Math.PI / 2; // Quay vuông góc theo trục Y
 
-      return group;
-    }
-  },
+    // Gom lại thành group
+    const group = new THREE.Group();
+    group.add(sphere);
+    group.add(circle1);
+    group.add(circle2);
+    group.rotation.y = Math.PI / 6;  
+    group.rotation.x = -Math.PI / 6; 
+    return group;
+  }
+}
+
+
 ];
 
 const ROTATE_STEP = Math.PI / 7.2; // ~25 độ
@@ -147,12 +184,22 @@ const DayHinhKhoi = () => {
 
   return (
     <View style={styles.container}>
-      <View style={{ width: '100%', alignItems: 'flex-start', marginTop: 20, zIndex: 2 }}>
-        <BackButton
-          textStyle={{ color: '#000000ff' }}
-          iconColor="#000"
-        />
-      </View>
+      <View
+            style={{
+              width: "100%",
+              flexDirection: "row",          
+              justifyContent: "space-between", 
+              alignItems: "center",
+              marginTop: 20,
+              marginBottom: 0,
+              paddingHorizontal: 10, 
+              zIndex: 1000,
+              backgroundColor: '#6021f3ff',
+            }}
+          >
+            <BackButton/>
+            <Music list="gameHinh2" />
+          </View>
 
       <View style={styles.shapeContainer}>
         <View style={styles.shape3DWrapper}>

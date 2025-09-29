@@ -11,6 +11,26 @@ import {
   View,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import Music from '../components/music';
+import { Audio } from 'expo-av';
+
+async function playEffect(effectFile: any) {
+  try {
+    const { sound } = await Audio.Sound.createAsync(effectFile);
+    await sound.playAsync();
+
+    // Tự động giải phóng sau khi phát xong
+    sound.setOnPlaybackStatusUpdate((status) => {
+      if (status.isLoaded && status.didJustFinish) {
+        sound.unloadAsync();
+      }
+    });
+  } catch (error) {
+    console.error("Lỗi phát hiệu ứng:", error);
+  }
+}
+
+
 
 type ShapeType = 'circle' | 'square' | 'triangle' | 'rectangle';
 type ShapeObj = {
@@ -146,6 +166,7 @@ const FallingShape: React.FC<{
 
 const GameHinh1: React.FC = () => {
   const router = useRouter();
+  const musicRef = useRef<any>(null);
   const [position, setPosition] = React.useState(1);
   const [countdown, setCountdown] = React.useState(3);
   const [showCountdown, setShowCountdown] = React.useState(true);
@@ -254,7 +275,7 @@ const GameHinh1: React.FC = () => {
   ]);
 
   // Khi hình rơi xong thì xóa khỏi danh sách và kiểm tra logic thắng/thua
-  const handleShapeEnd = (id: string, caught: boolean) => {
+  const handleShapeEnd = async (id: string, caught: boolean) => {
     setFallingShapes(prev => prev.filter(shape => shape.id !== id));
     if (isGameOver) return;
 
@@ -272,6 +293,7 @@ const GameHinh1: React.FC = () => {
       // Nếu nhặt đúng loại hình mục tiêu thì cộng điểm, không thua
       if (endedShape.type === currentTargetShape) {
         setScore(s => s + 10);
+        playEffect(require("../../../assets/audios/B2111885/catch.mp3"));
       } else {
         setIsGameOver(true);
       }
@@ -279,8 +301,12 @@ const GameHinh1: React.FC = () => {
       // Nếu hình rơi xuống đáy mà không nhặt, chỉ thua nếu đó là hình mục tiêu
       if (endedShape.type === currentTargetShape) {
         setIsGameOver(true);
+          if (musicRef.current) {
+            await musicRef.current.stopMusic(); 
+          }
+        playEffect(require("../../../assets/audios/B2111885/gameover.mp3"));
+        
       }
-      // Nếu không phải hình mục tiêu thì không thua
     }
   };
 
@@ -293,7 +319,7 @@ const GameHinh1: React.FC = () => {
   };
 
   // Reset game (nếu muốn chơi lại)
-  const handleRestart = () => {
+  const handleRestart = async() => {
     setScore(0);
     setIsGameOver(false);
     setDropBatchCount(0);
@@ -303,6 +329,9 @@ const GameHinh1: React.FC = () => {
     setCurrentTargetShape(null);
     setShowCountdown(true);
     setCountdown(3);
+      if (musicRef.current) {
+        await musicRef.current.restartMusic();
+      }
   };
 
   // Lấy điểm cao nhất khi vào game
@@ -321,6 +350,7 @@ const GameHinh1: React.FC = () => {
   }, [isGameOver, score, highScore]);
 
   return (
+    
     <ImageBackground
       source={require('../../../assets/images/B2111885/game_background.jpg')}
       style={styles.container}
@@ -329,6 +359,7 @@ const GameHinh1: React.FC = () => {
         {/* Box1: Hiển thị điểm */}
         <View style={styles.box1}>
           <View style={{ alignItems: 'flex-end', width: '100%', paddingRight: 20 }}>
+            <Music list="gameHinh1" onReady={(api:any) => (musicRef.current = api)} />
             <Text style={{ fontSize: 28, color: '#E65100', fontWeight: 'bold' }}>
               Điểm: {score}
             </Text>
@@ -428,7 +459,7 @@ const GameHinh1: React.FC = () => {
                     paddingVertical: 12,
                     borderRadius: 12,
                   }}
-                  onPress={() => router.replace('/(menu)/B2111885/TroChoiHinhHoc')}
+                  onPress={() => router.back()}
                 >
                   <Text style={{ color: '#fff', fontSize: 20, fontWeight: 'bold' }}>Trở về</Text>
                 </TouchableOpacity>
@@ -456,6 +487,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'flex-end', // căn phải
     paddingRight: 0, // padding sẽ đặt ở View con
+    marginTop:20
   },
   box2: {
     flex: 6,
