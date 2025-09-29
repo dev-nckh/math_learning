@@ -47,6 +47,14 @@ export default function MenuScreen() {
           Chapter 5: Hình học cơ bản  
         </Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.chapterButton}
+        onPress={()=>router.push('/(menu)/B2111885/DemSo')}
+      >
+        <Text style={styles.buttonText}>
+            Đếm số từ 0 đến 10
+        </Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
