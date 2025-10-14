@@ -15,6 +15,10 @@ import SubtractionGame from "./components/theory/ToanVo/Subtraction/LearnSubtrac
 
 import AdditionGame100 from "./components/theory/ToanVo1/Addition/AddTheoryScene";
 import SubtractionGame100 from "./components/theory/ToanVo1/Subtraction/SubtractionTheoryScene";
+// Time (Chapter 4) games – local, additive
+import TmReadClockChoose from "./types/Time/TmReadClockChoose";
+import TmReadClockSet from "./types/Time/TmReadClockSet";
+import TmMeasureTimeStop from "./types/Time/TmMeasureTimeStop";
 
 interface GameProps {
   chapterId: string;
@@ -84,6 +88,13 @@ export default function GameScreen() {
         return <AdditionGame100 {...gameProps} />;
       case "subtraction100":
         return <SubtractionGame100 {...gameProps} />;
+      // Chapter 4: Time
+      case "tm-time-choose-clock":
+        return <TmReadClockChoose />;
+      case "tm-time-set-clock":
+        return <TmReadClockSet />;
+      case "tm-time-stopwatch":
+        return <TmMeasureTimeStop />;
       default:
         return (
           <SafeAreaView style={styles.container}>
