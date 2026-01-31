@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { router } from "expo-router";
-import * as Speech from "expo-speech";
+import { useSpeech } from "../../useSpeechHook";
 import { FontAwesome5 } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
@@ -48,7 +48,11 @@ export default function SubtractionStepByStepScene({
   const [currentStep, setCurrentStep] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [showMovingSticks, setShowMovingSticks] = useState(false);
-  const [speaking, setSpeaking] = useState(false);
+  const { speak, stopSpeech, isSpeechActive, pageId } = useSpeech({
+    pageId: "SubtractionStepByStepScene",
+    autoCleanupOnUnmount: true,
+    autoStopOnBlur: true,
+  });
 
   const characterAnim = useRef(new Animated.Value(0)).current;
 
@@ -90,36 +94,6 @@ export default function SubtractionStepByStepScene({
     pitch: 1.1,
     rate: 0.75,
     volume: 1.0,
-  };
-
-  // Hàm đọc văn bản
-  const speak = async (
-    text: string,
-    options = {},
-    callback: (() => void) | null = null
-  ) => {
-    if (speaking) {
-      await Speech.stop();
-      setSpeaking(false);
-      return;
-    }
-
-    setSpeaking(true);
-
-    try {
-      await Speech.speak(text, {
-        ...speechOptions,
-        ...options,
-        onDone: () => {
-          setSpeaking(false);
-          if (callback) callback();
-        },
-        onError: () => setSpeaking(false),
-      });
-    } catch (error) {
-      console.error("Lỗi phát âm thanh:", error);
-      setSpeaking(false);
-    }
   };
 
   // Khởi tạo khi component mount
@@ -223,7 +197,7 @@ export default function SubtractionStepByStepScene({
 
     return () => {
       clearTimeout(timer);
-      Speech.stop();
+      stopSpeech();
     };
   }, [number1, number2]);
 
@@ -315,18 +289,21 @@ export default function SubtractionStepByStepScene({
 
   // Tự động đọc giải thích theo từng bước
   useEffect(() => {
-    if (currentStep === 1) {
-      setTimeout(() => {
-        speak(
+    const speakStep = async () => {
+      if (currentStep === 1) {
+        await speak(
           `Bước 1: Trừ phần đơn vị. ${donvi1} trừ ${donvi2} bằng ${donviResult}. Viết ${donviResult} vào hàng đơn vị của kết quả.`
         );
-      }, 300);
-    } else if (currentStep === 2) {
-      setTimeout(() => {
-        speak(
+        setCurrentStep(2);
+      } else if (currentStep === 2) {
+        await speak(
           `Bước 2: Trừ phần chục. ${chuc1} trừ ${chuc2} bằng ${chucResult}. Viết ${chucResult} vào hàng chục của kết quả. Vậy ${number1} trừ ${number2} bằng ${result}.`
         );
-      }, 300);
+        // ...hoặc set trạng thái hoàn thành...
+      }
+    };
+    if (currentStep === 1 || currentStep === 2) {
+      speakStep();
     }
   }, [currentStep]);
 
@@ -366,8 +343,7 @@ export default function SubtractionStepByStepScene({
   // Hàm tạo ví dụ mới - chỉ tạo phép trừ không nhớ
   const generateNewExample = () => {
     // Dừng speech đang phát nếu có
-    Speech.stop();
-    setSpeaking(false);
+    stopSpeech();
 
     // Hiển thị confetti
     setShowConfetti(true);
@@ -552,8 +528,7 @@ export default function SubtractionStepByStepScene({
   const handleNext = async () => {
     try {
       // Dừng giọng nói hiện tại trước khi chuyển bước
-      await Speech.stop();
-      setSpeaking(false);
+      await stopSpeech();
       console.log("🛑 Speech stopped before next transition");
     } catch (error) {
       console.warn("Error stopping speech in handleNext:", error);
@@ -602,10 +577,10 @@ export default function SubtractionStepByStepScene({
             activeOpacity={0.8}
           >
             <FontAwesome5
-              name={speaking ? "volume-up" : "volume-up"}
+              name={isSpeechActive() ? "volume-up" : "volume-up"}
               size={16}
-              color={speaking ? "#FF6B95" : "#1565C0"}
-              style={speaking ? styles.speakingIcon : {}}
+              color={isSpeechActive() ? "#FF6B95" : "#1565C0"}
+              style={isSpeechActive() ? styles.speakingIcon : {}}
             />
           </TouchableOpacity>
         </Animated.View>

@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useRef } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
 import { ImprovedSpeechUtils } from './speechUtils';
+import { useFocusEffect } from 'expo-router';
 
 interface UseSpeechOptions {
   pageId?: string;

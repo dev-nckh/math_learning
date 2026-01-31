@@ -17,7 +17,8 @@ import {
 import { Shadow } from "react-native-shadow-2";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesome5 } from "@expo/vector-icons";
-import * as Speech from "expo-speech";
+
+import { useSpeech } from "../../useSpeechHook";
 
 const { width } = Dimensions.get("window");
 
@@ -61,7 +62,11 @@ export default function AdditionTheoryScene({
   gameData,
 }: AdditionTheorySceneProps) {
   const [screenKey, setScreenKey] = useState(0);
-  const [speaking, setSpeaking] = useState(false);
+  const { speak, stopSpeech, isSpeechActive, pageId } = useSpeech({
+    pageId: "AdditionTheoryScene",
+    autoCleanupOnUnmount: true,
+    autoStopOnBlur: true,
+  });
   const [currentSection, setCurrentSection] = useState("intro"); // "intro", "term1", "term2", "commutative", "tips"
   type OwlPosition = "top" | "middle" | "bottom" | "tips";
   const [owlPosition, setOwlPosition] = useState<OwlPosition>("top"); // "top", "middle", "bottom", "tips"
@@ -94,101 +99,81 @@ export default function AdditionTheoryScene({
   };
 
   // Hàm đọc văn bản
-  const speak = async (
-    text: string,
-    options: object = {},
-    callback: (() => void) | null = null
-  ) => {
-    if (speaking) {
-      await Speech.stop();
-      setSpeaking(false);
-      return;
-    }
-
-    setSpeaking(true);
-
-    try {
-      await Speech.speak(text, {
-        ...speechOptions,
-        ...options,
-        onDone: () => {
-          setSpeaking(false);
-          if (callback) callback();
-        },
-        onError: () => setSpeaking(false),
-      });
-
-      // Hiệu ứng lắc lư nâng cao khi đang nói
-      if (speaking) {
-        // Tạo animation lắc lư tự nhiên, nhanh hơn khi nói
-        Animated.loop(
-          Animated.sequence([
-            // Lắc qua phải + nhún xuống nhẹ khi nói
-            Animated.parallel([
-              Animated.timing(owlSwayX, {
-                toValue: 4,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(owlRotate, {
-                toValue: 0.05,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(owlBounceY, {
-                toValue: 2,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(owlScaleY, {
-                toValue: 0.97,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(owlScaleX, {
-                toValue: 1.03,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-            ]),
-
-            // Lắc qua trái + nhún lên
-            Animated.parallel([
-              Animated.timing(owlSwayX, {
-                toValue: -4,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(owlRotate, {
-                toValue: -0.05,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(owlBounceY, {
-                toValue: -2,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(owlScaleY, {
-                toValue: 1.03,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(owlScaleX, {
-                toValue: 0.97,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-            ]),
+  useEffect(() => {
+    if (isSpeechActive()) {
+      // Bắt đầu hiệu ứng lắc lư nâng cao
+      const animation = Animated.loop(
+        Animated.sequence([
+          Animated.parallel([
+            Animated.timing(owlSwayX, {
+              toValue: 4,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(owlRotate, {
+              toValue: 0.05,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(owlBounceY, {
+              toValue: 2,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(owlScaleY, {
+              toValue: 0.97,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(owlScaleX, {
+              toValue: 1.03,
+              duration: 200,
+              useNativeDriver: true,
+            }),
           ]),
-          { iterations: 10 }
-        ).start();
-      }
-    } catch (error) {
-      console.error("Lỗi phát âm thanh:", error);
-      setSpeaking(false);
+          Animated.parallel([
+            Animated.timing(owlSwayX, {
+              toValue: -4,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(owlRotate, {
+              toValue: -0.05,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(owlBounceY, {
+              toValue: -2,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(owlScaleY, {
+              toValue: 1.03,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(owlScaleX, {
+              toValue: 0.97,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+          ]),
+        ]),
+        { iterations: 10 }
+      );
+      animation.start();
+
+      // Dừng animation khi speech kết thúc
+      return () => {
+        animation.stop();
+        owlSwayX.setValue(0);
+        owlRotate.setValue(0);
+        owlBounceY.setValue(0);
+        owlScaleX.setValue(1);
+        owlScaleY.setValue(1);
+      };
     }
-  };
+  }, [isSpeechActive()]);
 
   // Tạo hiệu ứng lắc lư tự nhiên cho chú cú
   const startOwlWobble = () => {
@@ -429,8 +414,8 @@ export default function AdditionTheoryScene({
       ]),
     ]).start(() => {
       // Sau khi lắc xong, bắt đầu đọc
-      setTimeout(() => {
-        speak(message);
+      setTimeout(async () => {
+        await speak(message);
       }, 500);
     });
   };
@@ -462,8 +447,9 @@ export default function AdditionTheoryScene({
     moveOwlToPosition("tips", 150, 1500, () => {
       // Đọc phần mẹo học
       setTimeout(() => {
+        shakeOwl("Để học phép cộng tốt hơn, các bạn hãy nhớ một số mẹo sau: ");
         shakeOwl(
-          "Để học phép cộng tốt hơn, các bạn hãy nhớ một số mẹo sau: Phép cộng các số có thứ tự thay đổi được, phép cộng với số 0 vẫn giữ nguyên giá trị ban đầu, và khi tính tổng các số, bạn có thể cộng theo nhóm để dễ dàng hơn."
+          "Phép cộng các số có thứ tự thay đổi được, phép cộng với số 0 vẫn giữ nguyên giá trị ban đầu, và khi tính tổng các số, bạn có thể cộng theo nhóm để dễ dàng hơn."
         );
       }, 1000);
     });
@@ -561,7 +547,7 @@ export default function AdditionTheoryScene({
     return () => {
       mounted = false;
       // Dừng âm thanh khi unmount component
-      Speech.stop();
+      stopSpeech();
     };
   }, [screenKey]);
 
@@ -587,12 +573,11 @@ export default function AdditionTheoryScene({
   };
 
   // Xử lý nút tải lại
-  const handleReload = () => {
+  const handleReload = async () => {
     animateButton(reloadButtonScale);
 
     // Dừng âm thanh hiện tại
-    Speech.stop();
-    setSpeaking(false);
+    await stopSpeech();
 
     // Reset các animation values
     owlSwayX.setValue(0);
@@ -642,6 +627,7 @@ export default function AdditionTheoryScene({
         return "Phép cộng có tính chất giao hoán: thứ tự các số hạng có thể đổi chỗ mà không làm thay đổi tổng.";
       case "tips":
         return "Để học phép cộng tốt hơn, các bạn hãy nhớ một số mẹo sau: Phép cộng các số có thứ tự thay đổi được, phép cộng với số 0 vẫn giữ nguyên giá trị ban đầu, và khi tính tổng các số, bạn có thể cộng theo nhóm để dễ dàng hơn.";
+
       default:
         return "Chào mừng bạn đến với lý thuyết về phép cộng!";
     }
@@ -702,8 +688,7 @@ export default function AdditionTheoryScene({
   const handleNext = async () => {
     try {
       // Dừng giọng nói hiện tại trước khi chuyển bước
-      await Speech.stop();
-      setSpeaking(false);
+      await stopSpeech();
       console.log("🛑 Speech stopped before next transition");
     } catch (error) {
       console.warn("Error stopping speech in handleNext:", error);
@@ -754,10 +739,10 @@ export default function AdditionTheoryScene({
                 activeOpacity={0.8}
               >
                 <FontAwesome5
-                  name={speaking ? "volume-up" : "volume-up"}
+                  name={isSpeechActive() ? "volume-up" : "volume-up"}
                   size={16}
-                  color={speaking ? "#1565C0" : "white"}
-                  style={speaking ? styles.speakingIcon : {}}
+                  color={isSpeechActive() ? "#1565C0" : "white"}
+                  style={isSpeechActive() ? styles.speakingIcon : {}}
                 />
               </TouchableOpacity>
             </LinearGradient>
@@ -799,8 +784,8 @@ export default function AdditionTheoryScene({
                       {/* Icon loa */}
                       <TouchableOpacity
                         style={styles.speakerIconContainer}
-                        onPress={() =>
-                          speak(
+                        onPress={async () =>
+                          await speak(
                             "Các số tham gia vào phép cộng được gọi là các số hạng."
                           )
                         }
@@ -835,8 +820,8 @@ export default function AdditionTheoryScene({
                       {/* Icon loa */}
                       <TouchableOpacity
                         style={styles.speakerIconContainer}
-                        onPress={() =>
-                          speak(
+                        onPress={async () =>
+                          await speak(
                             "Tổng là kết quả của phép cộng, là số lượng khi đã ghép các nhóm lại."
                           )
                         }
@@ -886,8 +871,8 @@ export default function AdditionTheoryScene({
                         styles.speakerIconContainer,
                         { top: 5, right: 5 },
                       ]}
-                      onPress={() =>
-                        speak(
+                      onPress={async () =>
+                        await speak(
                           "Phép cộng có tính chất giao hoán: thứ tự các số hạng có thể đổi chỗ mà không làm thay đổi tổng."
                         )
                       }
@@ -1032,17 +1017,28 @@ export default function AdditionTheoryScene({
                   {/* Icon loa cho phần mẹo học */}
                   <TouchableOpacity
                     style={styles.tipSpeakerContainer}
-                    onPress={() =>
-                      speak(
-                        "Để học phép cộng tốt hơn, các bạn hãy nhớ một số mẹo sau: Phép cộng các số có thứ tự thay đổi được, phép cộng với số 0 vẫn giữ nguyên giá trị ban đầu, và khi tính tổng các số, bạn có thể cộng theo nhóm để dễ dàng hơn."
-                      )
-                    }
+                    onPress={() => {
+                      try {
+                        speak(
+                          "Để học phép cộng tốt hơn, các bạn hãy nhớ một số mẹo sau."
+                        );
+                        speak("Phép cộng các số có thứ tự thay đổi được.");
+                        speak(
+                          "Phép cộng với số 0 vẫn giữ nguyên giá trị ban đầu."
+                        );
+                        speak(
+                          "Khi tính tổng các số, bạn có thể cộng theo nhóm để dễ dàng hơn."
+                        );
+                      } catch (error) {
+                        console.warn("TTS error:", error);
+                      }
+                    }}
                   >
                     <FontAwesome5
                       name="volume-up"
                       size={16}
                       color="#FF6B95"
-                      style={speaking ? styles.speakingIcon : {}}
+                      style={isSpeechActive() ? styles.speakingIcon : {}}
                     />
                   </TouchableOpacity>
                 </LinearGradient>
@@ -1064,10 +1060,10 @@ export default function AdditionTheoryScene({
             >
               <TouchableOpacity
                 style={styles.circleButton}
-                onPress={() => {
+                onPress={async () => {
                   animateButton(backButtonScale);
                   // Dừng âm thanh trước khi chuyển trang
-                  Speech.stop();
+                  await stopSpeech();
                   setTimeout(() => router.back(), 300);
                 }}
                 activeOpacity={0.8}

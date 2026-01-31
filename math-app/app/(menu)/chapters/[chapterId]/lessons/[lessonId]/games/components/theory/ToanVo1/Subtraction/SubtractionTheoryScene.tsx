@@ -17,7 +17,7 @@ import {
 import { Shadow } from "react-native-shadow-2";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesome5 } from "@expo/vector-icons";
-import * as Speech from "expo-speech";
+import { useSpeech } from "../../useSpeechHook";
 
 const { width } = Dimensions.get("window");
 
@@ -84,7 +84,11 @@ export default function SubtractionTheoryScene({
   gameData,
 }: SubtractionTheorySceneProps) {
   const [screenKey, setScreenKey] = useState(0);
-  const [speaking, setSpeaking] = useState(false);
+  const { speak, stopSpeech, isSpeechActive, pageId } = useSpeech({
+    pageId: "SubtractionTheoryScene",
+    autoCleanupOnUnmount: true,
+    autoStopOnBlur: true,
+  });
   const [currentExample, setCurrentExample] = useState(0);
   const [currentSection, setCurrentSection] = useState("intro"); // "intro", "term1", "term2", "term3", "example"
   const [owlPosition, setOwlPosition] = useState<
@@ -123,102 +127,81 @@ export default function SubtractionTheoryScene({
     volume: 1.0,
   };
 
-  // Hàm đọc văn bản
-  const speak = async (
-    text: string,
-    options: object = {},
-    callback: (() => void) | null = null
-  ) => {
-    if (speaking) {
-      await Speech.stop();
-      setSpeaking(false);
-      return;
-    }
-
-    setSpeaking(true);
-
-    try {
-      await Speech.speak(text, {
-        ...speechOptions,
-        ...options,
-        onDone: () => {
-          setSpeaking(false);
-          if (callback) callback();
-        },
-        onError: () => setSpeaking(false),
-      });
-
-      // Hiệu ứng lắc lư nâng cao khi đang nói
-      if (speaking) {
-        // Tạo animation lắc lư tự nhiên, nhanh hơn khi nói
-        Animated.loop(
-          Animated.sequence([
-            // Lắc qua phải + nhún xuống nhẹ khi nói
-            Animated.parallel([
-              Animated.timing(owlSwayX, {
-                toValue: 4,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(owlRotate, {
-                toValue: 0.05,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(owlBounceY, {
-                toValue: 2,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(owlScaleY, {
-                toValue: 0.97,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(owlScaleX, {
-                toValue: 1.03,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-            ]),
-
-            // Lắc qua trái + nhún lên
-            Animated.parallel([
-              Animated.timing(owlSwayX, {
-                toValue: -4,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(owlRotate, {
-                toValue: -0.05,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(owlBounceY, {
-                toValue: -2,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(owlScaleY, {
-                toValue: 1.03,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(owlScaleX, {
-                toValue: 0.97,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-            ]),
+  useEffect(() => {
+    if (isSpeechActive()) {
+      // Bắt đầu hiệu ứng lắc lư nâng cao
+      const animation = Animated.loop(
+        Animated.sequence([
+          Animated.parallel([
+            Animated.timing(owlSwayX, {
+              toValue: 4,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(owlRotate, {
+              toValue: 0.05,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(owlBounceY, {
+              toValue: 2,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(owlScaleY, {
+              toValue: 0.97,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(owlScaleX, {
+              toValue: 1.03,
+              duration: 200,
+              useNativeDriver: true,
+            }),
           ]),
-          { iterations: 10 }
-        ).start();
-      }
-    } catch (error) {
-      console.error("Lỗi phát âm thanh:", error);
-      setSpeaking(false);
+          Animated.parallel([
+            Animated.timing(owlSwayX, {
+              toValue: -4,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(owlRotate, {
+              toValue: -0.05,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(owlBounceY, {
+              toValue: -2,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(owlScaleY, {
+              toValue: 1.03,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(owlScaleX, {
+              toValue: 0.97,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+          ]),
+        ]),
+        { iterations: 10 }
+      );
+      animation.start();
+
+      // Dừng animation khi speech kết thúc
+      return () => {
+        animation.stop();
+        owlSwayX.setValue(0);
+        owlRotate.setValue(0);
+        owlBounceY.setValue(0);
+        owlScaleX.setValue(1);
+        owlScaleY.setValue(1);
+      };
     }
-  };
+  }, [isSpeechActive()]);
 
   // Tạo hiệu ứng lắc lư tự nhiên cho chú cú
   const startOwlWobble = () => {
@@ -594,7 +577,7 @@ export default function SubtractionTheoryScene({
     return () => {
       mounted = false;
       // Dừng âm thanh khi unmount component
-      Speech.stop();
+      stopSpeech();
     };
   }, [screenKey]);
 
@@ -639,8 +622,7 @@ export default function SubtractionTheoryScene({
     animateButton(reloadButtonScale);
 
     // Dừng âm thanh hiện tại
-    Speech.stop();
-    setSpeaking(false);
+    stopSpeech();
 
     // Reset các animation values
     removedAppleOpacity.setValue(1);
@@ -776,7 +758,7 @@ export default function SubtractionTheoryScene({
                 name="volume-up"
                 size={18}
                 color="#1565C0"
-                style={speaking ? styles.speakingIcon : {}}
+                style={isSpeechActive() ? styles.speakingIcon : {}}
               />
             </TouchableOpacity>
           </LinearGradient>
@@ -856,8 +838,7 @@ export default function SubtractionTheoryScene({
   const handleNext = async () => {
     try {
       // Dừng giọng nói hiện tại trước khi chuyển bước
-      await Speech.stop();
-      setSpeaking(false);
+      await stopSpeech();
       console.log("🛑 Speech stopped before next transition");
     } catch (error) {
       console.warn("Error stopping speech in handleNext:", error);
@@ -910,10 +891,10 @@ export default function SubtractionTheoryScene({
                 activeOpacity={0.8}
               >
                 <FontAwesome5
-                  name={speaking ? "volume-up" : "volume-up"}
+                  name={isSpeechActive() ? "volume-up" : "volume-up"}
                   size={16}
-                  color={speaking ? "#FF6B95" : "white"}
-                  style={speaking ? styles.speakingIcon : {}}
+                  color={isSpeechActive() ? "#FF6B95" : "white"}
+                  style={isSpeechActive() ? styles.speakingIcon : {}}
                 />
               </TouchableOpacity>
             </LinearGradient>
@@ -1063,7 +1044,7 @@ export default function SubtractionTheoryScene({
                       name="volume-up"
                       size={16}
                       color="#1565C0"
-                      style={speaking ? styles.speakingIcon : {}}
+                      style={isSpeechActive() ? styles.speakingIcon : {}}
                     />
                   </TouchableOpacity>
                 </LinearGradient>
@@ -1088,7 +1069,7 @@ export default function SubtractionTheoryScene({
                 onPress={() => {
                   animateButton(backButtonScale);
                   // Dừng âm thanh trước khi chuyển trang
-                  Speech.stop();
+                  stopSpeech();
                   setTimeout(() => router.replace("../chapter4"), 300);
                 }}
                 activeOpacity={0.8}

@@ -13,7 +13,8 @@ import {
 } from "react-native";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { router } from "expo-router";
-import * as Speech from "expo-speech";
+
+import { useSpeech } from "../../useSpeechHook";
 
 const { width } = Dimensions.get("window");
 
@@ -56,7 +57,11 @@ export default function SubtractionPracticeScene({
   const [showFeedback, setShowFeedback] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [gameOver, setGameOver] = useState(false);
-  const [speaking, setSpeaking] = useState(false);
+  const { speak, stopSpeech, isSpeechActive, pageId } = useSpeech({
+    pageId: "SubtractionPracticeScene",
+    autoCleanupOnUnmount: true,
+    autoStopOnBlur: true,
+  });
 
   // Thông tin phép tính
   const [number1, setNumber1] = useState(0);
@@ -87,37 +92,6 @@ export default function SubtractionPracticeScene({
     rate: 0.75,
     volume: 1.0,
   };
-
-  // Hàm đọc văn bản
-  const speak = async (
-    text: string,
-    options = {},
-    callback: (() => void) | null = null
-  ) => {
-    if (speaking) {
-      await Speech.stop();
-      setSpeaking(false);
-      return;
-    }
-
-    setSpeaking(true);
-
-    try {
-      await Speech.speak(text, {
-        ...speechOptions,
-        ...options,
-        onDone: () => {
-          setSpeaking(false);
-          if (callback) callback();
-        },
-        onError: () => setSpeaking(false),
-      });
-    } catch (error) {
-      console.error("Lỗi phát âm thanh:", error);
-      setSpeaking(false);
-    }
-  };
-
   // Tạo phép tính trừ mới (chỉ phép trừ KHÔNG nhớ)
   const generateNewQuestion = () => {
     // Tạo đơn vị không cần vay mượn (donvi1 > donvi2)
@@ -350,7 +324,7 @@ export default function SubtractionPracticeScene({
 
     // Dọn dẹp khi unmount
     return () => {
-      Speech.stop();
+      stopSpeech();
     };
   }, []);
 
@@ -369,7 +343,7 @@ export default function SubtractionPracticeScene({
   }, [fruitAnimValues]);
 
   // Xử lý khi học sinh chọn đáp án
-  const handleAnswerSelected = (selectedAnswer: number) => {
+  const handleAnswerSelected = async (selectedAnswer: number) => {
     const correctAnswer = number1 - number2;
     const isAnswerCorrect = selectedAnswer === correctAnswer;
 
@@ -385,7 +359,7 @@ export default function SubtractionPracticeScene({
 
     // Phát âm thanh phản hồi
     if (isAnswerCorrect) {
-      speak("Đúng rồi! Giỏi quá!");
+      await speak("Đúng rồi! Giỏi quá!");
       setScore(score + 1);
       setShowConfetti(true);
 
@@ -394,7 +368,7 @@ export default function SubtractionPracticeScene({
         setShowConfetti(false);
       }, 2000);
     } else {
-      speak(`Sai rồi! Đáp án đúng là ${correctAnswer}.`);
+      await speak(`Sai rồi! Đáp án đúng là ${correctAnswer}.`);
     }
 
     // Chuyển sang câu hỏi tiếp theo sau 1.5 giây
@@ -430,13 +404,13 @@ export default function SubtractionPracticeScene({
           setGameOver(true);
           // Thông báo kết quả
           const finalScore = isAnswerCorrect ? score + 1 : score;
-          setTimeout(() => {
+          setTimeout(async () => {
             if (finalScore === MAX_QUESTIONS) {
-              speak("Tuyệt vời! Con đã làm đúng tất cả!");
+              await speak("Tuyệt vời! Con đã làm đúng tất cả!");
             } else if (finalScore >= MAX_QUESTIONS / 2) {
-              speak("Làm tốt lắm! Con có thể làm tốt hơn!");
+              await speak("Làm tốt lắm! Con có thể làm tốt hơn!");
             } else {
-              speak("Hãy cố gắng thêm nhé!");
+              await speak("Hãy cố gắng thêm nhé!");
             }
           }, 500);
         }
