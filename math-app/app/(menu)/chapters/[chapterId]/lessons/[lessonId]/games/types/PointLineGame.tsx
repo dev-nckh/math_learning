@@ -78,12 +78,13 @@ const POINT_RADIUS = 8;
 const BALL_RADIUS = 12;
 const BASKET_WIDTH = 60;
 const BASKET_HEIGHT = 20;
-const GRAVITY = 0.4;
+// Reduce gravity to slow down ball falling speed
+const GRAVITY = 0.2; // Changed from 0.4 to 0.2
 const FRICTION = 0.85;
 const BOUNCE_DAMPING = 0.8;
 const TOUCH_RADIUS = 40;
-const MIN_VELOCITY = 0.05; // Minimum velocity before stopping
-const OVERLAP_THRESHOLD = 5; // Distance threshold for overlapping points
+const MIN_VELOCITY = 0.05;
+const OVERLAP_THRESHOLD = 5;
 
 export default function PhysicsBallGame({
   chapterId,
@@ -226,6 +227,7 @@ export default function PhysicsBallGame({
       newBall.x = drawAreaWidth - newBall.radius;
       newBall.velocityX = -Math.abs(newBall.velocityX) * BOUNCE_DAMPING;
     }
+
     // Bounce off the bottom (grid floor) naturally
     if (newBall.y + newBall.radius >= drawAreaHeight) {
       newBall.y = drawAreaHeight - newBall.radius;
@@ -802,13 +804,10 @@ export default function PhysicsBallGame({
       {/* Render tutorial popup */}
       {renderGameTutorial()}
 
-      {/* Header */}
+      {/* Header - removed score display */}
       <View style={styles.header}>
         <Text style={styles.gameTitle}>{gameData.title}</Text>
-        <View style={styles.scoreContainer}>
-          <Text style={styles.scoreText}>Điểm: {gameState.score}</Text>
-          <Text style={styles.progressText}>Level {gameState.level}</Text>
-        </View>
+        <Text style={styles.progressText}>Level {gameState.level}</Text>
       </View>
 
       {/* Instruction - Only show if tutorial hasn't been seen */}
@@ -819,11 +818,31 @@ export default function PhysicsBallGame({
             rơi từ trên xuống.
           </Text>
           <Text style={styles.hintText}>
-            💡 Chạm để tạo điểm → Kéo giữa các điểm để vẽ đường → Bắt đầu thả
+            💡 Chạm để tạo điểm → Kẻ giữa các điểm để vẽ đường → Bắt đầu thả
             bóng!
           </Text>
         </View>
       )}
+
+      {/* Point Information - Simplified and made smaller */}
+      <View style={styles.topInfoContainer}>
+        <View style={styles.pointInfo}>
+          <Text style={styles.smallInfoText}>
+            Điểm: {gameState.points.length}
+          </Text>
+        </View>
+        
+        <View style={styles.helpButtonsContainer}>
+          {hasSeenGameTutorial && (
+            <TouchableOpacity
+              style={styles.helpButton}
+              onPress={() => setShowGameTutorial(true)}
+            >
+              <Text style={styles.helpButtonText}>?</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
 
       {/* Drawing Area */}
       <View style={styles.drawingArea}>
@@ -996,7 +1015,6 @@ export default function PhysicsBallGame({
               >
                 <View style={styles.ballInner} />
                 {ballCollisionEffect && <View style={styles.collisionRing} />}
-                {debugMode && <View style={styles.debugCollisionRadius} />}
               </Animated.View>
             )}
 
@@ -1035,83 +1053,29 @@ export default function PhysicsBallGame({
                   Nhấn &quot;Bắt đầu&quot; để thả bóng xuống!
                 </Text>
               )}
-
-            {debugMode && gameState.ball && (
-              <Text style={styles.debugInfo}>
-                Velocity: X={gameState.ball.velocityX.toFixed(2)}, Y=
-                {gameState.ball.velocityY.toFixed(2)}
-              </Text>
-            )}
           </View>
         </TouchableOpacity>
       </View>
 
-      {/* Control Buttons */}
+      {/* Control Buttons - Added exit button similar to start button */}
       <View style={styles.controlContainer}>
         <TouchableOpacity
-          style={[styles.controlButton, styles.clearButton]}
-          onPress={removeLastLine}
-          disabled={gameState.isPlaying || gameState.lines.length === 0}
+          style={styles.exitButtonCircle}
+          onPress={() => router.back()}
         >
-          <Text style={styles.controlButtonText}>↶ Hoàn tác</Text>
+          <Text style={styles.controlButtonText}>🚪</Text>
         </TouchableOpacity>
-
+        
         <TouchableOpacity
-          style={[styles.controlButton, styles.clearButton]}
-          onPress={clearCanvas}
-          disabled={gameState.isPlaying || gameState.lines.length === 0}
-        >
-          <Text style={styles.controlButtonText}>🗑️ Xóa hết</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.controlButton, styles.playButton]}
+          style={styles.startButtonCircle}
           onPress={startGameLoop}
           disabled={gameState.isPlaying || gameState.points.length === 0}
         >
           <Text style={styles.controlButtonText}>
-            {gameState.isPlaying ? "⏸️ Đang chơi" : "▶️ Bắt đầu"}
+            {gameState.isPlaying ? "⏸️" : "▶️"}
           </Text>
         </TouchableOpacity>
       </View>
-
-      {/* Game Info and Help Button */}
-      <View style={styles.infoContainer}>
-        <Text style={styles.infoText}>
-          Điểm: {gameState.points.length}
-          {gameState.points.length < 2 ? " (cần ít nhất 2)" : ""}
-        </Text>
-        <Text style={styles.infoText}>Đường: {gameState.lines.length}</Text>
-        <Text style={styles.infoText}>
-          Bóng:{" "}
-          {gameState.ball
-            ? gameState.ball.hasHitLine
-              ? "✅ Đã chạm"
-              : "❌ Chưa chạm"
-            : "🏀 Sẵn sàng"}
-        </Text>
-
-        {hasSeenGameTutorial && (
-          <TouchableOpacity
-            style={styles.helpButton}
-            onPress={() => setShowGameTutorial(true)}
-          >
-            <Text style={styles.helpButtonText}>❓</Text>
-          </TouchableOpacity>
-        )}
-
-        <TouchableOpacity
-          style={[styles.helpButton, debugMode && styles.debugActive]}
-          onPress={() => setDebugMode(!debugMode)}
-        >
-          <Text style={styles.helpButtonText}>🐛</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Exit Button */}
-      <TouchableOpacity style={styles.exitButton} onPress={() => router.back()}>
-        <Text style={styles.exitButtonText}>🚪 Thoát</Text>
-      </TouchableOpacity>
     </SafeAreaView>
   );
 }
@@ -1131,17 +1095,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#2c3e50",
     marginBottom: 10,
-  },
-  scoreContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    paddingHorizontal: 20,
-  },
-  scoreText: {
-    fontSize: 18,
-    color: "#27ae60",
-    fontWeight: "bold",
   },
   progressText: {
     fontSize: 16,
@@ -1171,7 +1124,36 @@ const styles = StyleSheet.create({
     color: "#7f8c8d",
     fontStyle: "italic",
   },
-
+  // New container for point information above the game area
+  topInfoContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  pointInfo: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    flex: 1,
+  },
+  helpButtonsContainer: {
+    flexDirection: "row",
+  },
+  // Smaller text for point information
+  smallInfoText: {
+    fontSize: 14,
+    color: "#34495e",
+    fontWeight: "500",
+  },
   drawingArea: {
     backgroundColor: "white",
     borderRadius: 10,
@@ -1203,16 +1185,6 @@ const styles = StyleSheet.create({
     color: "#95a5a6",
     textAlign: "center",
     paddingHorizontal: 20,
-  },
-  debugInfo: {
-    position: "absolute",
-    top: 10,
-    left: 10,
-    fontSize: 12,
-    color: "#e74c3c",
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
-    padding: 5,
-    borderRadius: 5,
   },
   ball: {
     position: "absolute",
@@ -1253,76 +1225,52 @@ const styles = StyleSheet.create({
     left: -BALL_RADIUS * 0.5,
     opacity: 0.7,
   },
-  debugCollisionRadius: {
-    position: "absolute",
-    width: BALL_RADIUS * 2,
-    height: BALL_RADIUS * 2,
-    borderRadius: BALL_RADIUS,
-    borderWidth: 1,
-    borderColor: "#e74c3c",
-    backgroundColor: "rgba(231, 76, 60, 0.1)",
-    top: 0,
-    left: 0,
-  },
-  debugActive: {
-    backgroundColor: "#e74c3c",
-  },
   controlContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around", // Changed to space around for better spacing
     alignItems: "center",
     marginBottom: 20,
     paddingHorizontal: 10,
   },
-  controlButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    flex: 1,
-    marginHorizontal: 5,
+  // Circular exit button style
+  exitButtonCircle: {
+    backgroundColor: "#e74c3c", // Red color for exit
+    width: 70,
+    height: 70,
+    borderRadius: 35,
     alignItems: "center",
     justifyContent: "center",
-    minHeight: 44,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
-  clearButton: {
-    backgroundColor: "#e74c3c",
-  },
-  startButton: {
-    backgroundColor: "#f39c12",
-  },
-  playButton: {
+  // Circular start button style
+  startButtonCircle: {
     backgroundColor: "#27ae60",
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   controlButtonText: {
     color: "white",
-    fontSize: 13,
+    fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
   },
-  infoContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    backgroundColor: "white",
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  infoText: {
-    fontSize: 14,
-    color: "#34495e",
-    fontWeight: "500",
-  },
   helpButton: {
     backgroundColor: "#f39c12",
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     justifyContent: "center",
     alignItems: "center",
     shadowColor: "#000",
@@ -1330,20 +1278,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 3,
+    marginLeft: 10,
   },
   helpButtonText: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  exitButton: {
-    backgroundColor: "#34495e",
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  exitButtonText: {
-    color: "white",
     fontSize: 16,
     fontWeight: "bold",
   },

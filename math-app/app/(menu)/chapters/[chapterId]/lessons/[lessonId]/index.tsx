@@ -64,8 +64,25 @@ export default function LessonScreen() {
 
       addition100: "#e74c3c",
       subtraction100: "#27ae60",
+      // Time lesson types
+      "tm-time-choose-clock": "#3b82f6", // blue
+      "tm-time-set-clock": "#8b5cf6", // indigo/purple
+      "tm-time-stopwatch": "#14b8a6", // teal
     };
     return colors[type] || "#95a5a6";
+  };
+
+  const getGameTypeLabel = (type: string) => {
+    switch (type) {
+      case "tm-time-choose-clock":
+        return "Time choose clock";
+      case "tm-time-set-clock":
+        return "Time set clock";
+      case "tm-time-stopwatch":
+        return "Time stop clock";
+      default:
+        return type;
+    }
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -134,7 +151,7 @@ export default function LessonScreen() {
                     { backgroundColor: getGameTypeColor(game.type) },
                   ]}
                 >
-                  <Text style={styles.typeText}>{game.type}</Text>
+                  <Text style={styles.typeText}>{getGameTypeLabel(game.type)}</Text>
                 </View>
                 <Text style={styles.arrowText}>🎮</Text>
               </View>

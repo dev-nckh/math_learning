@@ -25,7 +25,7 @@ import Animated, {
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { Shadow } from "react-native-shadow-2";
-import * as Speech from "expo-speech";
+import { useSpeech } from "../../useSpeechHook";
 
 const { width, height } = Dimensions.get("window");
 
@@ -65,7 +65,6 @@ export default function LearnSubtractScene({
   const [showResult, setShowResult] = useState(false);
   const [screenKey, setScreenKey] = useState(0);
   const [imagesLoaded, setImagesLoaded] = useState(false);
-  const [speaking, setSpeaking] = useState(false); // Trạng thái giọng nói
 
   // Animated values cho nội dung (Reanimated)
   const antX = useSharedValue(width);
@@ -140,35 +139,40 @@ export default function LearnSubtractScene({
   };
 
   // Hàm đọc văn bản
-  const speak = async (text: string, options = {}) => {
-    if (speaking) {
-      await stopSpeech(); // Dừng giọng nói hiện tại trước khi phát giọng nói mới
-    }
+  // const speak = async (text: string, options = {}) => {
+  //   if (speaking) {
+  //     await stopSpeech(); // Dừng giọng nói hiện tại trước khi phát giọng nói mới
+  //   }
 
-    setSpeaking(true);
+  //   setSpeaking(true);
 
-    try {
-      await Speech.speak(text, {
-        ...speechOptions,
-        ...options,
-        onDone: () => setSpeaking(false),
-        onError: () => setSpeaking(false),
-      });
-    } catch (error) {
-      console.error("Speech error:", error);
-      setSpeaking(false);
-    }
-  };
+  //   try {
+  //     await Speech.speak(text, {
+  //       ...speechOptions,
+  //       ...options,
+  //       onDone: () => setSpeaking(false),
+  //       onError: () => setSpeaking(false),
+  //     });
+  //   } catch (error) {
+  //     console.error("Speech error:", error);
+  //     setSpeaking(false);
+  //   }
+  // };
 
-  // Hàm dừng giọng nói
-  const stopSpeech = async () => {
-    try {
-      await Speech.stop();
-      setSpeaking(false);
-    } catch (error) {
-      console.warn("Error stopping speech:", error);
-    }
-  };
+  // // Hàm dừng giọng nói
+  // const stopSpeech = async () => {
+  //   try {
+  //     await Speech.stop();
+  //     setSpeaking(false);
+  //   } catch (error) {
+  //     console.warn("Error stopping speech:", error);
+  //   }
+  // };
+  const { speak, stopSpeech, isSpeechActive, pageId } = useSpeech({
+    pageId: `LearnSubtractScene-${chapterId}-${lessonId}-${gameId}`,
+    autoCleanupOnUnmount: true,
+    autoStopOnBlur: true,
+  });
 
   // Tạo hiệu ứng lắc lư tự nhiên cho chú cú
   const startOwlWobble = () => {
@@ -467,7 +471,7 @@ export default function LearnSubtractScene({
 
       // Đọc câu thứ hai - đợi lâu hơn để trẻ hiểu câu đầu tiên
       setTimeout(() => {
-        speak("Ồ không! 2 chú kiến tinh nghịch đang lấy đi 2 cái bánh!");
+        speak("Ồ không! Có chú kiến tinh nghịch đang lấy đi 2 cái bánh!");
       }, 1500); // Tăng từ 1000ms lên 1500ms
 
       // Tăng thời gian trước khi kiến di chuyển (từ 3000ms lên 4500ms)
@@ -592,7 +596,7 @@ export default function LearnSubtractScene({
   const getCurrentMessage = () => {
     if (showText3) return "Vậy là mình chỉ còn lại 4 cái bánh thôi";
     if (showText2)
-      return "Ồ không! 2 chú kiến tinh nghịch đang lấy đi 2 cái bánh!";
+      return "Ồ không! Có chú kiến tinh nghịch đang lấy đi 2 cái bánh!";
     if (showText1) return "Mình có 6 chiếc bánh ngon lành";
     return "";
   };
@@ -679,7 +683,7 @@ export default function LearnSubtractScene({
                     </Text>
                     <Text style={styles.speech}>
                       {showText2 &&
-                        "Ồ không! 2 chú kiến tinh nghịch đang lấy đi 2 cái bánh!"}
+                        "Ồ không! Có chú kiến tinh nghịch đang lấy đi 2 cái bánh!"}
                     </Text>
                     <Text style={styles.speech}>
                       {showText3 && "Vậy là mình chỉ còn lại 4 cái bánh thôi"}
@@ -692,10 +696,10 @@ export default function LearnSubtractScene({
                       activeOpacity={0.8}
                     >
                       <FontAwesome5
-                        name={speaking ? "volume-up" : "volume-up"}
+                        name={isSpeechActive() ? "volume-up" : "volume-up"}
                         size={16}
-                        color={speaking ? "#FF6B95" : "#666"}
-                        style={speaking ? styles.speakingIcon : {}}
+                        color={isSpeechActive() ? "#FF6B95" : "#666"}
+                        style={isSpeechActive() ? styles.speakingIcon : {}}
                       />
                     </TouchableOpacity>
                   </Shadow>
@@ -796,13 +800,11 @@ export default function LearnSubtractScene({
                 >
                   <TouchableOpacity
                     style={styles.circleButton}
-                    onPress={() => {
+                    onPress={async () => {
                       animateButton(backButtonScale);
 
                       // Dừng âm thanh trước khi chuyển trang
-                      if (speaking) {
-                        stopSpeech();
-                      }
+                      await stopSpeech();
 
                       setTimeout(() => {
                         // Reset các giá trị animation

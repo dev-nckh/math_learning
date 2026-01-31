@@ -20,7 +20,7 @@ import {
 import { Shadow } from "react-native-shadow-2";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesome5 } from "@expo/vector-icons";
-import * as Speech from "expo-speech";
+import { useSpeech } from "../../useSpeechHook";
 
 // Enable LayoutAnimation for Android
 if (Platform.OS === "android") {
@@ -134,7 +134,11 @@ export default function AddTheoryScene({
   // Ban đầu chỉ hiển thị 3 số đầu tiên
   const [visibleCount, setVisibleCount] = useState(3);
   const [screenKey, setScreenKey] = useState(0);
-  const [speaking, setSpeaking] = useState(false);
+  const { speak, stopSpeech, isSpeechActive, pageId } = useSpeech({
+    pageId: "SubtractMelonScene",
+    autoCleanupOnUnmount: true,
+    autoStopOnBlur: true,
+  });
 
   // Animated values cho UI elements
   const titleOpacity = useRef(new Animated.Value(0)).current;
@@ -158,102 +162,89 @@ export default function AddTheoryScene({
   const data = allItems.slice(0, visibleCount);
 
   // Cấu hình giọng nói
-  const speechOptions = {
-    language: "vi-VN",
-    pitch: 1.1, // Cao độ (0.5-2.0)
-    rate: 0.75, // Tốc độ chậm để trẻ hiểu rõ (0.1-2.0)
-    volume: 1.0, // Âm lượng (0-1.0)
-  };
+  // const speechOptions = {
+  //   language: "vi-VN",
+  //   pitch: 1.1, // Cao độ (0.5-2.0)
+  //   rate: 0.75, // Tốc độ chậm để trẻ hiểu rõ (0.1-2.0)
+  //   volume: 1.0, // Âm lượng (0-1.0)
+  // };
 
-  // Hàm đọc văn bản
-  const speak = async (text: string, options = {}) => {
-    if (speaking) {
-      await Speech.stop();
-      setSpeaking(false);
-      return;
-    }
-
-    setSpeaking(true);
-
-    try {
-      await Speech.speak(text, {
-        ...speechOptions,
-        ...options,
-        onDone: () => setSpeaking(false),
-        onError: () => setSpeaking(false),
-      });
-
-      // Hiệu ứng lắc lư nâng cao khi đang nói
-      if (speaking) {
-        // Tạo animation lắc lư tự nhiên, nhanh hơn khi nói
-        Animated.loop(
-          Animated.sequence([
-            // Lắc qua phải + nhún xuống nhẹ khi nói
-            Animated.parallel([
-              Animated.timing(owlSwayX, {
-                toValue: 4,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(owlRotate, {
-                toValue: 0.05,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(owlBounceY, {
-                toValue: 2,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(owlScaleY, {
-                toValue: 0.97,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(owlScaleX, {
-                toValue: 1.03,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-            ]),
-
-            // Lắc qua trái + nhún lên
-            Animated.parallel([
-              Animated.timing(owlSwayX, {
-                toValue: -4,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(owlRotate, {
-                toValue: -0.05,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(owlBounceY, {
-                toValue: -2,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(owlScaleY, {
-                toValue: 1.03,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(owlScaleX, {
-                toValue: 0.97,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-            ]),
+  // Hiệu ứng lắc lư nâng cao khi đang nói
+  useEffect(() => {
+    if (isSpeechActive()) {
+      // Bắt đầu hiệu ứng lắc lư nâng cao
+      const animation = Animated.loop(
+        Animated.sequence([
+          Animated.parallel([
+            Animated.timing(owlSwayX, {
+              toValue: 4,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(owlRotate, {
+              toValue: 0.05,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(owlBounceY, {
+              toValue: 2,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(owlScaleY, {
+              toValue: 0.97,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(owlScaleX, {
+              toValue: 1.03,
+              duration: 200,
+              useNativeDriver: true,
+            }),
           ]),
-          { iterations: 10 }
-        ).start();
-      }
-    } catch (error) {
-      console.error("Lỗi phát âm thanh:", error);
-      setSpeaking(false);
+          Animated.parallel([
+            Animated.timing(owlSwayX, {
+              toValue: -4,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(owlRotate, {
+              toValue: -0.05,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(owlBounceY, {
+              toValue: -2,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(owlScaleY, {
+              toValue: 1.03,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(owlScaleX, {
+              toValue: 0.97,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+          ]),
+        ]),
+        { iterations: 10 }
+      );
+      animation.start();
+
+      // Dừng animation khi speech kết thúc
+      return () => {
+        animation.stop();
+        owlSwayX.setValue(0);
+        owlRotate.setValue(0);
+        owlBounceY.setValue(0);
+        owlScaleX.setValue(1);
+        owlScaleY.setValue(1);
+      };
     }
-  };
+  }, [isSpeechActive()]);
 
   // Tạo hiệu ứng lắc lư tự nhiên cho chú cú
   const startOwlWobble = () => {
@@ -490,8 +481,8 @@ export default function AddTheoryScene({
       ]),
     ]).start(() => {
       // Sau khi lắc xong, bắt đầu đọc
-      setTimeout(() => {
-        speak(message);
+      setTimeout(async () => {
+        await speak(message);
       }, 500);
     });
   };
@@ -523,29 +514,32 @@ export default function AddTheoryScene({
     startOwlWobble();
 
     // Đọc phần giới thiệu sau khi UI hiển thị
-    setTimeout(() => {
-      speak(
-        "Mỗi số có hai phần là chục và đơn vị. Dưới đây là các ví dụ về cách viết và đọc số."
-      );
+    setTimeout(async () => {
+      await speak("Mỗi số có hai phần là chục và đơn vị.");
+      await speak("Dưới đây là các ví dụ về cách viết và đọc số.");
 
       // Đọc giải thích về ví dụ đầu tiên sau 2 giây
-      setTimeout(() => {
-        speak(
-          "Ta có Ví dụ đầu tiên đây là hình ảnh 1 bó que và 2 que riêng, vậy ta có 1 bó que tương đương với hàng chục là 1 và 2 que riêng tương đương với hàng đơn vị là 2, viết số là 12 và đọc số là mười hai"
+      setTimeout(async () => {
+        await speak(
+          "Ta có Ví dụ đầu tiên đây là hình ảnh 1 bó que và 2 que riêng"
         );
-      }, 5000); // Chờ 5 giây để đủ thời gian đọc câu đầu
-    }, 1000);
+        await speak(
+          "vậy ta có 1 bó que tương đương với hàng chục là 1 và 2 que riêng tương đương với hàng đơn vị là 2, viết số là 12 và đọc số là mười hai"
+        );
+      }, 2000); // Chờ 2 giây để đủ thời gian đọc câu đầu
+    }, 2000);
 
     return () => {
       mounted = false;
       // Dừng âm thanh khi unmount component
-      Speech.stop();
+      stopSpeech();
     };
   }, [screenKey]);
 
   // Xử lý khi nhấn nút hiện thêm - chỉ hiển thị thêm 1 số mới mỗi lần nhấn
-  const handleTap = () => {
+  const handleTap = async () => {
     // Animate button
+    await stopSpeech();
     Animated.sequence([
       Animated.timing(loadMoreScale, {
         toValue: 0.9,
@@ -595,10 +589,9 @@ export default function AddTheoryScene({
   };
 
   // Xử lý nút tải lại
-  const handleReload = () => {
+  const handleReload = async () => {
     // Dừng âm thanh hiện tại
-    Speech.stop();
-    setSpeaking(false);
+    await stopSpeech();
 
     // Reset các animation values
     owlSwayX.setValue(0);
@@ -665,8 +658,7 @@ export default function AddTheoryScene({
   const handleNext = async () => {
     try {
       // Dừng giọng nói hiện tại trước khi chuyển bước
-      await Speech.stop();
-      setSpeaking(false);
+      await stopSpeech();
       console.log("🛑 Speech stopped before next transition");
     } catch (error) {
       console.warn("Error stopping speech in handleNext:", error);
@@ -756,10 +748,10 @@ export default function AddTheoryScene({
                   activeOpacity={0.8}
                 >
                   <FontAwesome5
-                    name={speaking ? "volume-up" : "volume-up"}
+                    name={isSpeechActive() ? "volume-up" : "volume-up"}
                     size={16}
-                    color={speaking ? "#FF6B95" : "#666"}
-                    style={speaking ? styles.speakingIcon : {}}
+                    color={isSpeechActive() ? "#FF6B95" : "#666"}
+                    style={isSpeechActive() ? styles.speakingIcon : {}}
                   />
                 </TouchableOpacity>
               </Shadow>
@@ -866,7 +858,7 @@ export default function AddTheoryScene({
                             index % 2 === 0 ? "#FFF8E1" : "#FFFFFF",
                         },
                       ]}
-                      onPress={() => speak(getExplanationFor(item))}
+                      onPress={async () => await speak(getExplanationFor(item))}
                       activeOpacity={0.8}
                     >
                       <View
@@ -1026,10 +1018,10 @@ export default function AddTheoryScene({
             >
               <TouchableOpacity
                 style={styles.circleButton}
-                onPress={() => {
+                onPress={async () => {
                   animateButton(backButtonScale);
                   // Dừng âm thanh trước khi chuyển trang
-                  Speech.stop();
+                  await stopSpeech();
                   setTimeout(() => router.back(), 300);
                 }}
                 activeOpacity={0.8}

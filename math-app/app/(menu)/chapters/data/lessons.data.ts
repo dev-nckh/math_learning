@@ -59,7 +59,13 @@ export const lessonsData: LessonsDataStructure = {
       description: "Học cách vẽ điểm và đoạn thẳng",
       games: [
         { id: 1, title: "Vẽ điểm và đoạn thẳng", type: "draw", difficulty: "Dễ" },
-
+      ]
+    },
+    2: {
+      title: "Bài 2: Đo độ dài",
+      description: "Học cách đo độ dài đoạn thẳng",
+      games: [
+        { id: 1, title: "Đo độ dài đoạn thẳng", type: "measure", difficulty: "Trung bình", description: "Trò chơi Stick Hero giúp bé học cách ước lượng độ dài" },
       ]
     }
   },
@@ -70,7 +76,21 @@ export const lessonsData: LessonsDataStructure = {
       games: [
         { id: 1, title: "Phép cộng từ 1-100", type: "addition100", difficulty: "Trung bình" },
         { id: 2, title: "Phép trừ từ 1-100", type: "subtraction100", difficulty: "Trung bình" },
-
+      ]
+    },
+    2: {
+      title: "Bài 2: Đọc đồng hồ",
+      description: "Học cách đọc giờ trên đồng hồ kim",
+      games: [
+        { id: 1, title: "Chọn đồng hồ đúng", type: "tm-time-choose-clock", difficulty: "Dễ" },
+        { id: 2, title: "Xoay/đặt kim đồng hồ", type: "tm-time-set-clock", difficulty: "Trung bình" },
+      ]
+    },
+    3: {
+      title: "Bài 3: Đo thời gian",
+      description: "Trò chơi: Dừng đồng hồ đúng lúc",
+      games: [
+        { id: 1, title: "Dừng đồng hồ đúng lúc", type: "tm-time-stopwatch", difficulty: "Dễ" },
       ]
     }
   }
