@@ -24,24 +24,48 @@ export interface LessonsDataStructure {
 
 export const lessonsData: LessonsDataStructure = {
   1: { // Chapter 1
-    1: {
-      title: "Bài 1: Đếm từ 1 đến 10",
-      description: "Học cách đếm các số từ 1 đến 10 thông qua trò chơi",
-      games: [
-        { id: 1, title: "Đếm quả táo", type: "counting", difficulty: "Dễ" },
-        { id: 2, title: "Ghép số với hình", type: "matching", difficulty: "Dễ" },
-        { id: 3, title: "Sắp xếp số", type: "sorting", difficulty: "Trung bình" },
-      ]
-    },
-    2: {
-      title: "Bài 2: Đếm từ 10 đến 20",
-      description: "Mở rộng khả năng đếm lên số 20",
-      games: [
-        { id: 1, title: "Đếm kẹo", type: "counting", difficulty: "Dễ" },
-        { id: 2, title: "Tìm số thiếu", type: "puzzle", difficulty: "Trung bình" },
-      ]
-    }
+  1: {
+    title: "Bài 1: Đếm từ 1 đến 10",
+    description: "Học cách đếm các số từ 1 đến 10 thông qua trò chơi",
+    games: [
+      { id: 1, title: "Đếm quả táo", type: "counting", difficulty: "Dễ" },
+      { id: 2, title: "Ghép số với hình", type: "matching", difficulty: "Dễ" },
+      { id: 3, title: "Sắp xếp số", type: "sorting", difficulty: "Trung bình" },
+    ]
   },
+
+  2: {
+    title: "Bài 2: Đếm từ 10 đến 20",
+    description: "Mở rộng khả năng đếm lên số 20",
+    games: [
+      { id: 1, title: "Đếm kẹo", type: "counting", difficulty: "Dễ" },
+      { id: 2, title: "Tìm số thiếu", type: "puzzle", difficulty: "Trung bình" },
+    ]
+  },
+
+  // 🔥 THÊM BÀI SO SÁNH
+  3: {
+    title: "Bài 3: Dấu so sánh (<, >, =)",
+    description: "Học các dấu so sánh lớn hơn, bé hơn, bằng nhau",
+    games: [
+      {
+        id: 1,
+        title: "So sánh số",
+        type: "comparison",
+        difficulty: "Dễ",
+        description: "Chọn dấu đúng giữa hai số",
+      },
+      {
+        id: 2,
+        title: "Chọn dấu < > =",
+        type: "quiz",
+        difficulty: "Trung bình",
+        description: "Luyện tập chọn dấu so sánh",
+      },
+    ]
+  }
+},
+
   2: { // Chapter 2
     1: {
       title: "Bài 1: Phép cộng và trừ cơ bản",

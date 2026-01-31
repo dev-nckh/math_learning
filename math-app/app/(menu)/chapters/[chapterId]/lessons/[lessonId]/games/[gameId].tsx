@@ -1,24 +1,28 @@
-// games/[gameId].tsx - Game Dispatcher
 import { useLocalSearchParams } from "expo-router";
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-// Import các game components
-
-// Shared data (nên move ra file riêng)
 import { lessonsData } from "../../../../data/lessons.data";
+
+// Common games
 import DrawPointGame from "./types/PointLineGame";
 import MeasureLengthGame from "./types/MeasureLength";
+
+// Arithmetic
 import AdditionGame from "./components/theory/ToanVo/Addition/LearnAddScene";
 import SubtractionGame from "./components/theory/ToanVo/Subtraction/LearnSubtractScene";
-
 import AdditionGame100 from "./components/theory/ToanVo1/Addition/AddTheoryScene";
 import SubtractionGame100 from "./components/theory/ToanVo1/Subtraction/SubtractionTheoryScene";
-// Time (Chapter 4) games – local, additive
+
+// Time games
 import TmReadClockChoose from "./types/Time/TmReadClockChoose";
 import TmReadClockSet from "./types/Time/TmReadClockSet";
 import TmMeasureTimeStop from "./types/Time/TmMeasureTimeStop";
+
+// 🔥 Comparison games (LẤY TỪ DỰ ÁN PHỤ)
+import ComparisonIndex from "./comparison";
+import ChooseSignGame from "./comparison/ChooseSignGame";
 
 interface GameProps {
   chapterId: string;
@@ -43,11 +47,15 @@ export default function GameScreen() {
   const chapterNum = parseInt(chapterId as string);
   const lessonNum = parseInt(lessonId as string);
   const gameNum = parseInt(gameId as string);
+  const chapterNum = Number(chapterId);
+  const lessonNum = Number(lessonId);
+  const gameNum = Number(gameId);
 
   const lessonData = lessonsData[chapterNum]?.[lessonNum];
   const gameData = lessonData?.games.find((game: any) => game.id === gameNum);
+  const lessonData = lessonsData?.[chapterNum]?.[lessonNum];
+  const gameData = lessonData?.games?.find((g: any) => g.id === gameNum);
 
-  // Error handling
   if (!lessonData || !gameData) {
     return (
       <SafeAreaView style={styles.container}>
@@ -61,58 +69,57 @@ export default function GameScreen() {
     );
   }
 
-  // Game type dispatcher
-  const renderGame = () => {
-    // For components that accept props
-    const gameProps: GameProps = {
-      chapterId: chapterId as string,
-      lessonId: lessonId as string,
-      gameId: gameId as string,
-      gameData: {
-        ...gameData,
-        description: gameData.description || "No description available",
-      },
-    };
-
-    switch (gameData.type) {
-      case "draw":
-        return <DrawPointGame {...gameProps} />;
-      case "measure":
-        // Now MeasureLengthGame accepts props like other components
-        return <MeasureLengthGame {...gameProps} />;
-      case "addition":
-        return <AdditionGame {...gameProps} />;
-      case "subtraction":
-        return <SubtractionGame {...gameProps} />; // Thay bằng component thực tế khi có
-      case "addition100":
-        return <AdditionGame100 {...gameProps} />;
-      case "subtraction100":
-        return <SubtractionGame100 {...gameProps} />;
-      // Chapter 4: Time
-      case "tm-time-choose-clock":
-        return <TmReadClockChoose />;
-      case "tm-time-set-clock":
-        return <TmReadClockSet />;
-      case "tm-time-stopwatch":
-        return <TmMeasureTimeStop />;
-      default:
-        return (
-          <SafeAreaView style={styles.container}>
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorTitle}>🚧</Text>
-              <Text style={styles.errorText}>
-                Game type &quot;{gameData.type}&quot; chưa được implement!
-              </Text>
-              <Text style={styles.errorSubtext}>
-                Hãy thêm component cho loại game này
-              </Text>
-            </View>
-          </SafeAreaView>
-        );
-    }
+  const gameProps: GameProps = {
+    chapterId,
+    lessonId,
+    gameId,
+    gameData: {
+      ...gameData,
+      description: gameData.description || "No description available",
+    },
   };
 
-  return renderGame();
+  switch (gameData.type) {
+    case "draw":
+      return <DrawPointGame {...gameProps} />;
+    case "measure":
+      return <MeasureLengthGame {...gameProps} />;
+
+    case "addition":
+      return <AdditionGame {...gameProps} />;
+    case "subtraction":
+      return <SubtractionGame {...gameProps} />;
+    case "addition100":
+      return <AdditionGame100 {...gameProps} />;
+    case "subtraction100":
+      return <SubtractionGame100 {...gameProps} />;
+
+    // ⏰ TIME
+    case "tm-time-choose-clock":
+      return <TmReadClockChoose />;
+    case "tm-time-set-clock":
+      return <TmReadClockSet />;
+    case "tm-time-stopwatch":
+      return <TmMeasureTimeStop />;
+
+    // 🔥 COMPARISON (QUAN TRỌNG)
+    case "comparison":
+      return <ComparisonIndex />;
+    case "quiz":
+      return <ChooseSignGame />;
+
+    default:
+      return (
+        <SafeAreaView style={styles.container}>
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorTitle}>🚧</Text>
+            <Text style={styles.errorText}>
+              Game type "{gameData.type}" chưa được implement!
+            </Text>
+          </View>
+        </SafeAreaView>
+      );
+  }
 }
 
 const styles = StyleSheet.create({
