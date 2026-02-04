@@ -44,15 +44,10 @@ export default function GameScreen() {
     gameId: string;
   }>();
 
-  const chapterNum = parseInt(chapterId as string);
-  const lessonNum = parseInt(lessonId as string);
-  const gameNum = parseInt(gameId as string);
   const chapterNum = Number(chapterId);
   const lessonNum = Number(lessonId);
   const gameNum = Number(gameId);
 
-  const lessonData = lessonsData[chapterNum]?.[lessonNum];
-  const gameData = lessonData?.games.find((game: any) => game.id === gameNum);
   const lessonData = lessonsData?.[chapterNum]?.[lessonNum];
   const gameData = lessonData?.games?.find((g: any) => g.id === gameNum);
 

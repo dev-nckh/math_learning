@@ -1,3 +1,4 @@
+import React from "react";
 import {
   StyleSheet,
   Text,
@@ -6,11 +7,15 @@ import {
   ScrollView,
   View,
 } from "react-native";
-import React from "react";
 import { router, useLocalSearchParams } from "expo-router";
 
 // Dữ liệu lessons và games
 import { lessonsData } from "../../../data/lessons.data";
+
+type Params = {
+  chapterId?: string | string[];
+  lessonId?: string | string[];
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -133,10 +138,15 @@ const styles = StyleSheet.create({
   },
 });
 
+function asString(v: string | string[] | undefined) {
+  return Array.isArray(v) ? v[0] : v;
+}
+
 export default function LessonScreen() {
-  const { chapterId, lessonId } = useLocalSearchParams();
-  const chapterNum = parseInt(chapterId as string);
-  const lessonNum = parseInt(lessonId as string);
+  const { chapterId, lessonId } = useLocalSearchParams<Params>();
+
+  const chapterNum = parseInt(asString(chapterId) || "", 10);
+  const lessonNum = parseInt(asString(lessonId) || "", 10);
 
   const lessonData =
     lessonsData[chapterNum as keyof typeof lessonsData]?.[
@@ -185,10 +195,10 @@ export default function LessonScreen() {
 
       addition100: "#e74c3c",
       subtraction100: "#27ae60",
-      // Time lesson types
-      "tm-time-choose-clock": "#3b82f6", // blue
-      "tm-time-set-clock": "#8b5cf6", // indigo/purple
-      "tm-time-stopwatch": "#14b8a6", // teal
+
+      "tm-time-choose-clock": "#3b82f6",
+      "tm-time-set-clock": "#8b5cf6",
+      "tm-time-stopwatch": "#14b8a6",
     };
     return colors[type] || "#95a5a6";
   };
