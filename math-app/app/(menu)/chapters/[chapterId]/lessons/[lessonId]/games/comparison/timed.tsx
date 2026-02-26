@@ -34,7 +34,7 @@ export default function TimedMode() {
 
   const startWith = (sec: number) => {
     setTimeSec(sec);
-    setTimeout(() => engine.start(), 0);
+    engine.start(sec);
   };
 
   const titleText = useMemo(() => {
@@ -87,6 +87,24 @@ export default function TimedMode() {
           <View style={styles.infoRow}>
             <Text style={styles.badge}>Điểm: {engine.ui.score}</Text>
             <Text style={styles.badge}>⏱ {engine.ui.timeLeft}s</Text>
+          </View>
+
+          {/* Time Progress Bar */}
+          <View style={styles.timerBarContainer}>
+            <View
+              style={[
+                styles.timerBarFill,
+                {
+                  width: `${Math.max(0, (engine.ui.timeLeft / (timeSec || 1)) * 100)}%`,
+                  backgroundColor:
+                    engine.ui.timeLeft > (timeSec || 30) * 0.3
+                      ? "#2ecc71"
+                      : engine.ui.timeLeft > (timeSec || 30) * 0.1
+                        ? "#f39c12"
+                        : "#e74c3c",
+                },
+              ]}
+            />
           </View>
 
           <Text style={styles.numbers}>
@@ -154,4 +172,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   choiceText: { color: "#fff", fontSize: 28, fontWeight: "900" },
+  timerBarContainer: {
+    width: "100%",
+    height: 24,
+    backgroundColor: "#ecf0f1",
+    borderRadius: 12,
+    overflow: "hidden",
+    marginVertical: 8,
+  },
+  timerBarFill: {
+    height: "100%",
+    borderRadius: 12,
+  },
 });
