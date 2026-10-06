@@ -45,7 +45,7 @@ export const lessonsData: LessonsDataStructure = {
 
   // 🔥 THÊM BÀI SO SÁNH
   3: {
-    title: "Bài 3: Dấu so sánh (<, >, =)",
+    title: "Bài 1: Dấu so sánh (<, >, =)",
     description: "Học các dấu so sánh lớn hơn, bé hơn, bằng nhau",
     games: [
       {
@@ -68,30 +68,32 @@ export const lessonsData: LessonsDataStructure = {
 
   2: { // Chapter 2
     1: {
-      title: "Bài 1: Phép cộng và trừ cơ bản",
-      description: "Học phép cộng và phép trừ với số nhỏ từ 1 đến 10",
+      title: "Bài 2: Phép cộng và trừ cơ bản",
+      description: "Học phép cộng và phép trừ với số từ 1 đến 100",
       games: [
         { id: 1, title: "Phép cộng từ 1-10", type: "addition", difficulty: "Dễ" },
         { id: 2, title: "Phép trừ từ 1-10", type: "subtraction", difficulty: "Dễ" },
-        { id: 3, title: "Học ...", type: "racing", difficulty: "Khó" },
+        { id: 3, title: "Phép cộng từ 1-100", type: "addition100", difficulty: "Trung bình" },
+        { id: 4, title: "Phép trừ từ 1-100", type: "subtraction100", difficulty: "Trung bình" },
       ]
     }
   },
   3: { // Chapter 3
     1: {
-      title: "Bài 2: Điểm và đoạn thẳng",
-      description: "Học cách vẽ điểm và đoạn thẳng",
+      title: "Bài 3: Điểm và đoạn thẳng",
+      description: "Học cách vẽ điểm, đoạn thẳng và đo độ dài đoạn thẳng",
       games: [
         { id: 1, title: "Vẽ điểm và đoạn thẳng", type: "draw", difficulty: "Dễ" },
+        { id: 2, title: "Đo độ dài đoạn thẳng", type: "measure", difficulty: "Trung bình", description: "Trò chơi Stick Hero giúp bé học cách ước lượng độ dài" },
       ]
     },
-    2: {
-      title: "Bài 2: Đo độ dài",
-      description: "Học cách đo độ dài đoạn thẳng",
-      games: [
-        { id: 1, title: "Đo độ dài đoạn thẳng", type: "measure", difficulty: "Trung bình", description: "Trò chơi Stick Hero giúp bé học cách ước lượng độ dài" },
-      ]
-    }
+    // 2: {
+    //   title: "Bài 2: Đo độ dài",
+    //   description: "Học cách đo độ dài đoạn thẳng",
+    //   games: [
+    //     { id: 1, title: "Đo độ dài đoạn thẳng", type: "measure", difficulty: "Trung bình", description: "Trò chơi Stick Hero giúp bé học cách ước lượng độ dài" },
+    //   ]
+    // }
   },
   4: { // Chapter 4
     1: {
@@ -103,11 +105,12 @@ export const lessonsData: LessonsDataStructure = {
       ]
     },
     2: {
-      title: "Bài 2: Đọc đồng hồ",
+      title: "Bài 4: Đọc đồng hồ",
       description: "Học cách đọc giờ trên đồng hồ kim",
       games: [
         { id: 1, title: "Chọn đồng hồ đúng", type: "tm-time-choose-clock", difficulty: "Dễ" },
         { id: 2, title: "Xoay/đặt kim đồng hồ", type: "tm-time-set-clock", difficulty: "Trung bình" },
+        { id: 3, title: "Dừng đồng hồ đúng lúc", type: "tm-time-stopwatch", difficulty: "Dễ" },
       ]
     },
     3: {
@@ -124,8 +127,6 @@ export const chapterData = {
   '1': {
     title: 'Học đếm số',
     lessons: [
-      { id: '1', title: 'Bài 1: Điểm và đoạn thẳng', description: 'Giúp bé biết cách vẽ điểm và đoạn thẳng', completed: false },
-      { id: '2', title: 'Bài 2: Đếm từ 6-10', description: 'Tiếp tục đếm số', completed: false },
       { id: '3', title: 'Bài 3: Ôn tập 1-10', description: 'Ôn tập tổng hợp', completed: false },
     ]
   },

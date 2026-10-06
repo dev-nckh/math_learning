@@ -1,178 +1,184 @@
-import { useEffect, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
-import Tutorial from "./components/Tutorial";
-import { generateComparisonPair, normalizeRangeMode } from "./range";
+
+import ScreenShell from "./components/ScreenShell";
+import TutorialModal from "./components/TutorialModal";
+import GameOverModal from "./components/GameOverModal";
+import { useComparisonEngine } from "./hooks/useComparisonEngine";
+
+type Preset = { total: number; time: number };
 
 export default function HybridMode() {
-  const { rangeMode } = useLocalSearchParams<{ rangeMode?: string }>();
-  const selectedRange = normalizeRangeMode(rangeMode);
+  const { chapterId, lessonId, rangeMode } = useLocalSearchParams<{
+    chapterId: string;
+    lessonId: string;
+    rangeMode?: string;
+  }>();
 
-  const [step, setStep] = useState<"tutorial" | "select" | "game" | "result">(
-    "tutorial"
-  );
-  const [numbers, setNumbers] = useState({ a: 0, b: 0 });
-  const [score, setScore] = useState(0);
-  const [question, setQuestion] = useState(1);
-  const [totalQuestions, setTotalQuestions] = useState<number | null>(null);
-  const [timeLeft, setTimeLeft] = useState(60);
-  const [lives, setLives] = useState(3);
+  const [showTut, setShowTut] = useState(false);
+  const [preset, setPreset] = useState<Preset | null>(null);
 
-  const generateNumbers = () => generateComparisonPair(selectedRange);
+  const engine = useComparisonEngine({
+    rangeMode,
+    totalQuestions: preset?.total,
+    hasTimer: true,
+    initialTimeSec: preset?.time ?? 0,
+    hasLives: true,
+    initialLives: 3,
+  });
 
-  const startGame = (count: number | null) => {
-    setTotalQuestions(count);
-    setNumbers(generateNumbers());
-    setScore(0);
-    setQuestion(1);
-    setTimeLeft(60);
-    setLives(3);
-    setStep("game");
+  const backToIndex = () => {
+    router.replace({
+      pathname:
+        "/(menu)/chapters/[chapterId]/lessons/[lessonId]/games/comparison",
+      params: { chapterId, lessonId },
+    });
   };
 
-  useEffect(() => {
-    if (step === "game") {
-      if (timeLeft <= 0) {
-        setStep("result");
-        return;
-      }
-      const t = setTimeout(() => setTimeLeft((prev) => prev - 1), 1000);
-      return () => clearTimeout(t);
-    }
-  }, [step, timeLeft]);
-
-  const checkAnswer = (choice: "<" | ">" | "=") => {
-    let correct: "<" | ">" | "=" = "=";
-    if (numbers.a < numbers.b) correct = "<";
-    else if (numbers.a > numbers.b) correct = ">";
-
-    if (choice === correct) {
-      setScore((prev) => prev + 1);
-    } else {
-      setLives((prev) => prev - 1);
-      if (lives - 1 <= 0) {
-        setStep("result");
-        return;
-      }
-    }
-
-    if (totalQuestions && question < totalQuestions) {
-      setQuestion((prev) => prev + 1);
-      setNumbers(generateNumbers());
-    } else {
-      setStep("result");
-    }
+  const startWith = (p: Preset) => {
+    setPreset(p);
+    setTimeout(() => engine.start(), 0);
   };
 
-  const exitGame = () => router.back();
+  const titleText = useMemo(() => {
+    if (!preset) return "Giờ + Mạng";
+    return `⚡ ${engine.ui.timeLeft}s | ❤️ ${engine.ui.lives}`;
+  }, [preset, engine.ui.timeLeft, engine.ui.lives]);
 
-  if (step === "tutorial") {
-    return (
-      <View style={styles.container}>
-        <Tutorial />
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => setStep("select")}
-        >
-          <Text style={styles.text}>Bắt đầu</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  if (step === "select") {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Chọn số câu</Text>
-
-        {[10, 15, 20].map((n) => (
-          <TouchableOpacity
-            key={n}
-            style={styles.button}
-            onPress={() => startGame(n)}
-          >
-            <Text style={styles.text}>{n} câu</Text>
-          </TouchableOpacity>
-        ))}
-
-        <TouchableOpacity style={styles.button} onPress={() => startGame(10)}>
-          <Text style={styles.text}>Chơi ngay</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.backBtn} onPress={exitGame}>
-          <Text style={styles.backText}>⬅ Quay lại</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  if (step === "game") {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>
-          ⏱ {timeLeft}s • ❤️ {lives}
-        </Text>
-        <Text style={styles.title}>
-          Câu {question}/{totalQuestions}
-        </Text>
-
-        <Text style={styles.numbers}>
-          {numbers.a} ? {numbers.b}
-        </Text>
-
-        <View style={styles.row}>
-          {(["<", "=", ">"] as const).map((op) => (
-            <TouchableOpacity
-              key={op}
-              style={styles.choiceBtn}
-              onPress={() => checkAnswer(op)}
-            >
-              <Text style={styles.choiceText}>{op}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-    );
-  }
+  const gameOverTitle =
+    engine.ui.endReason === "time"
+      ? "Hết giờ!"
+      : engine.ui.endReason === "lives"
+        ? "Hết mạng!"
+        : "Hoàn thành!";
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Kết quả</Text>
-      <Text style={styles.score}>Điểm: {score}</Text>
+    <ScreenShell
+      title={titleText}
+      onBack={backToIndex}
+      rightActionText="?"
+      onRightActionPress={() => setShowTut(true)}
+    >
+      <TutorialModal visible={showTut} onClose={() => setShowTut(false)} />
 
-      <TouchableOpacity style={styles.button} onPress={() => setStep("select")}>
-        <Text style={styles.text}>Chơi lại</Text>
-      </TouchableOpacity>
+      <GameOverModal
+        visible={engine.ui.ended}
+        title={gameOverTitle}
+        score={engine.ui.score}
+        correct={engine.ui.correct}
+        wrong={engine.ui.wrong}
+        onRetry={() => engine.start()}
+        onExit={backToIndex}
+      />
 
-      <TouchableOpacity style={styles.button} onPress={exitGame}>
-        <Text style={styles.text}>Thoát</Text>
-      </TouchableOpacity>
-    </View>
+      {!preset ? (
+        <View style={{ gap: 12 }}>
+          <Text style={styles.hint}>Chọn gói chơi</Text>
+
+          {[
+            { total: 10, time: 30 },
+            { total: 15, time: 45 },
+            { total: 20, time: 60 },
+          ].map((p) => (
+            <TouchableOpacity
+              key={`${p.total}-${p.time}`}
+              style={styles.primary}
+              onPress={() => startWith(p)}
+            >
+              <Text style={styles.primaryText}>
+                {p.total} câu • {p.time} giây • 3 mạng
+              </Text>
+            </TouchableOpacity>
+          ))}
+
+          <TouchableOpacity style={styles.secondary} onPress={backToIndex}>
+            <Text style={styles.secondaryText}>⬅ Quay lại</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <View style={{ flex: 1, justifyContent: "center", gap: 14 }}>
+          <View style={styles.infoRow}>
+            <Text style={styles.badge}>Điểm: {engine.ui.score}</Text>
+            <Text style={styles.badge}>⏱ {engine.ui.timeLeft}s</Text>
+            <Text style={styles.badge}>❤️ {engine.ui.lives}</Text>
+          </View>
+
+          <Text style={styles.numbers}>
+            {engine.ui.a} ? {engine.ui.b}
+          </Text>
+
+          <View style={styles.row}>
+            {(["<", "=", ">"] as const).map((op) => {
+              const isThisSelected = engine.ui.selectedOp === op;
+
+              const shouldPaint = isThisSelected && engine.ui.feedback !== null;
+
+              const bg =
+                shouldPaint && engine.ui.feedback === "correct"
+                  ? "#2ecc71"
+                  : shouldPaint && engine.ui.feedback === "wrong"
+                    ? "#e74c3c"
+                    : "#34495e";
+
+              return (
+                <TouchableOpacity
+                  key={op}
+                  style={[styles.choiceBtn, { backgroundColor: bg }]}
+                  disabled={engine.ui.locked}
+                  onPress={() => engine.submit(op)}
+                >
+                  <Text style={styles.choiceText}>{op}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          <Text style={styles.tip}>
+            Kết thúc khi: hết giờ, hết mạng hoặc xong số câu.
+          </Text>
+        </View>
+      )}
+    </ScreenShell>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", alignItems: "center" },
-  title: { fontSize: 22, fontWeight: "bold", marginBottom: 15 },
-  numbers: { fontSize: 48, marginVertical: 25, fontWeight: "bold" },
-  row: { flexDirection: "row" },
-  choiceBtn: {
-    backgroundColor: "#e67e22",
-    padding: 18,
-    borderRadius: 12,
-    marginHorizontal: 10,
-  },
-  choiceText: { color: "#fff", fontSize: 28, fontWeight: "bold" },
-  button: {
+  hint: { fontSize: 16, fontWeight: "900", marginBottom: 4 },
+  primary: {
     backgroundColor: "#3498db",
-    padding: 15,
-    borderRadius: 10,
-    marginVertical: 10,
-    width: "80%",
+    paddingVertical: 16,
+    borderRadius: 16,
     alignItems: "center",
   },
-  text: { color: "#fff", fontSize: 18, fontWeight: "bold" },
-  score: { fontSize: 22, fontWeight: "bold", marginBottom: 20 },
-  backBtn: { marginTop: 10 },
-  backText: { fontSize: 16, fontWeight: "bold" },
+  primaryText: { color: "#fff", fontWeight: "900", fontSize: 15 },
+  secondary: {
+    backgroundColor: "#ecf0f1",
+    paddingVertical: 14,
+    borderRadius: 16,
+    alignItems: "center",
+    marginTop: 8,
+  },
+  secondaryText: { color: "#2c3e50", fontWeight: "900", fontSize: 16 },
+  infoRow: { flexDirection: "row", justifyContent: "space-between", gap: 8 },
+  badge: {
+    flex: 1,
+    textAlign: "center",
+    backgroundColor: "#f4f6f8",
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    borderRadius: 14,
+    fontWeight: "900",
+  },
+  numbers: { fontSize: 44, fontWeight: "900", textAlign: "center" },
+  row: { flexDirection: "row", justifyContent: "space-between", gap: 12 },
+  choiceBtn: {
+    flex: 1,
+    backgroundColor: "#34495e",
+    borderRadius: 18,
+    paddingVertical: 18,
+    alignItems: "center",
+  },
+  choiceText: { color: "#fff", fontSize: 28, fontWeight: "900" },
+  tip: { textAlign: "center", color: "#555", fontWeight: "700" },
 });
